@@ -13,14 +13,36 @@ class LabReportAnalyzer:
         }
 
         self.body_systems = {
-            "metabolism": ["glucose", "insulin", "thyroid", "metabolic"],
-            "nutrition": ["vitamin", "mineral", "protein", "albumin"],
-            "digestive": ["liver", "enzyme", "bilirubin", "ALT", "AST"],
-            "blood": ["hemoglobin", "RBC", "WBC", "platelets"],
-            "heart": ["cholesterol", "HDL", "LDL", "triglycerides"],
-            "kidney": ["creatinine", "BUN", "GFR", "urea"],
-            "immunity": ["lymphocytes", "antibodies", "immunoglobulin"]
-        }
+    "metabolism": {
+        "icon": "local_fire_department",
+        "tests": ["glucose", "insulin", "thyroid", "metabolic"]
+    },
+    "nutrition": {
+        "icon": "restaurant", 
+        "tests": ["vitamin", "mineral", "protein", "albumin"]
+    },
+    "digestive": {
+        "icon": "lunch_dining",
+        "tests": ["liver", "enzyme", "bilirubin", "ALT", "AST"]
+    },
+    "blood": {
+        "icon": "bloodtype",
+        "tests": ["hemoglobin", "RBC", "WBC", "platelets"]
+    },
+    "heart": {
+        "icon": "favorite",
+        "tests": ["cholesterol", "HDL", "LDL", "triglycerides"]
+    },
+    "kidney": {
+        "icon": "water_drop",
+        "tests": ["creatinine", "BUN", "GFR", "urea"]
+    },
+    "immunity": {
+        "icon": "shield",
+        "tests": ["lymphocytes", "antibodies", "immunoglobulin"]
+    }
+}
+
 
         self.patterns = {
             'measurement': r'(\d+\.?\d*)\s*(mg/dL|g/dL|U/L|%|mmol/L|µmol/L|ng/mL|pg/mL|mIU/L|µIU/mL|g/L|mmHg|fL|K/µL)',

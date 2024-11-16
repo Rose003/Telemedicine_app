@@ -1,411 +1,294 @@
-{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard with Sidebar and Lab Reports</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Reports Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* Your existing styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f9f9f9;
-            display: flex;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: #f4f6f8;
-            padding: 20px;
-            height: 100vh;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-        .sidebar h2 {
-            font-size: 12px;
-            color: #8a8a8a;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .sidebar .search-box input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .sidebar .summary-item,
-        .sidebar .body-system-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 14px;
-            color: #333;
-            cursor: pointer;
-        }
-        .sidebar .summary-item i,
-        .sidebar .body-system-item i {
-            font-size: 18px;
-            margin-right: 10px;
-        }
-        .sidebar .summary-item.active {
-            font-weight: bold;
-            color: #ff4b4b;
-        }
-        .summary-item:nth-child(2) {
-            color: #f7b500;
-        }
-        .summary-item:nth-child(3) {
-            color: #4caf50;
-        }
-        .sidebar .body-systems {
-            margin-top: 20px;
-        }
-        .body-system-item i {
-            width: 24px;
-            text-align: center;
-        }
-        .body-system-item[data-icon="metabolism"] i { color: #ff7043; }
-        .body-system-item[data-icon="nutrition"] i { color: #4caf50; }
-        .body-system-item[data-icon="digestive"] i { color: #f57c00; }
-        .body-system-item[data-icon="liver"] i { color: #ff5252; }
-        .body-system-item[data-icon="pancreas"] i { color: #ffb74d; }
-        .body-system-item[data-icon="adrenal"] i { color: #ff6e40; }
-        .body-system-item[data-icon="thyroid"] i { color: #9575cd; }
-        .body-system-item[data-icon="reproductive"] i { color: #f06292; }
-        .body-system-item[data-icon="blood"] i { color: #e57373; }
-        .body-system-item[data-icon="heart"] i { color: #d32f2f; }
-        .body-system-item[data-icon="kidney"] i { color: #64b5f6; }
-        .body-system-item[data-icon="immunity"] i { color: #81c784; }
-        
-     /* Main Content Layout */
-.main-content {
-    flex: 1;
-    padding: 24px;
-    background-color: #f9f9f9;
-}
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f5f7fa;
+        display: flex;
+      }
 
-/* Upload Section */
-.upload-section {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-bottom: 24px;
-}
+      /* Sidebar */
+      .sidebar {
+        width: 250px;
+        background-color: #f4f6f8;
+        padding: 20px;
+        height: 100vh;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      }
 
-.upload-form-group {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
+      .sidebar h2 {
+        font-size: 12px;
+        color: #8a8a8a;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
 
-.hospital-label {
-    color: #333;
-    font-weight: 500;
-}
+      .sidebar .search-box input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
 
-#hospital {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 250px;
-}
+      .sidebar .summary-item,
+      .sidebar .body-system-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+      }
 
-.upload-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #e63946;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
+      .sidebar .summary-item i,
+      .sidebar .body-system-item i {
+        font-size: 18px;
+        margin-right: 10px;
+      }
 
-.upload-btn:hover {
-    background: #dc3545;
-}
+      .sidebar .summary-item.active {
+        font-weight: bold;
+        color: #ff4b4b;
+      }
 
-/* Reports Container */
-.reports-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
+      .summary-item:nth-child(2) { color: #f7b500; }
+      .summary-item:nth-child(3) { color: #4caf50; }
 
-.report-item {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+      /* Body System Icons Colors */
+      .body-system-item[data-icon="metabolism"] i { color: #ff7043; }
+      .body-system-item[data-icon="nutrition"] i { color: #4caf50; }
+      .body-system-item[data-icon="digestive"] i { color: #f57c00; }
+      .body-system-item[data-icon="liver"] i { color: #ff5252; }
+      .body-system-item[data-icon="pancreas"] i { color: #ffb74d; }
+      .body-system-item[data-icon="adrenal"] i { color: #ff6e40; }
+      .body-system-item[data-icon="thyroid"] i { color: #9575cd; }
+      .body-system-item[data-icon="reproductive"] i { color: #f06292; }
+      .body-system-item[data-icon="blood"] i { color: #e57373; }
+      .body-system-item[data-icon="heart"] i { color: #d32f2f; }
+      .body-system-item[data-icon="kidney"] i { color: #64b5f6; }
+      .body-system-item[data-icon="immunity"] i { color: #81c784; }
 
-.report-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        padding: 30px;
+        background-color: #f5f7fa;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
 
-/* Report Details */
-.report-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+      .main-content h1 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-weight: 600;
+      }
 
-.report-title {
-    font-weight: 600;
-    color: #333;
-    font-size: 16px;
-}
-/* Summary Dashboard */
-.summary-dashboard {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
+      /* Upload Section */
+      .upload-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+      }
 
-.summary-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
-}
+      .upload-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
 
-.summary-card.abnormal { border-left: 4px solid #ff4b4b; }
-.summary-card.optimal { border-left: 4px solid #f7b500; }
-.summary-card.normal { border-left: 4px solid #4caf50; }
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
 
-.summary-card .count {
-    font-size: 32px;
-    font-weight: bold;
-    margin: 10px 0;
-}
+      .input-group input:focus {
+        border-color: #2196f3;
+        outline: none;
+      }
 
-/* Test Cards */
-.test-card {
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
+      .file-upload {
+        position: relative;
+        width: 100%;
+      }
 
-.test-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: #f8f9fa;
-}
+      .file-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
 
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-}
+      .file-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px;
+        border: 2px dashed #2196f3;
+        border-radius: 6px;
+        background: #f5f9ff;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
 
-.test-body {
-    padding: 20px;
-}
+      .file-label:hover {
+        background: #e3f2fd;
+      }
 
-.value-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
+      .file-name {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #666;
+      }
 
-.value {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.range {
-    color: #666;
-    font-size: 14px;
-}
-
-.clinical-section, .recommendations-section {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.clinical-section h5, .recommendations-section h5 {
-    color: #333;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.clinical-section ul, .recommendations-section ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.clinical-section li, .recommendations-section li {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    color: #555;
-}
-.clinical-section li:last-child, .recommendations-section li:last-child {
-    border-bottom: none;
-}
-
-/* Controls Panel */
-.controls-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.filter-group, .sort-group {
-    display: flex;
-    gap: 10px;
-}
-
-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: white;
-}
-
-.sort-btn {
-    padding: 8px 16px;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.sort-btn:hover {
-    background: #e9ecef;
-}
-
-/* Print Button */
-.print-section {
-    text-align: right;
-    margin: 20px 0;
-}
-
-.print-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: #457b9d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.print-btn:hover {
-    background: #1d3557;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .summary-dashboard {
-        grid-template-columns: 1fr;
-    }
-    
-    .controls-panel {
+      /* Reports List */
+      .reports-container {
+        display: flex;
         flex-direction: column;
         gap: 15px;
-    }
-    
-    .filter-group, .sort-group {
-        width: 100%;
-    }
-    
-    select {
-        width: 100%;
-    }
-}
+      }
 
+      .report-item {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
 
-/* Report Actions */
-.report-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+      .report-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
 
-.report-actions a {
-    color: #2196f3;
-    text-decoration: none;
-    font-weight: 500;
-}
+      .report-details {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
 
-.delete-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
+      .report-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
 
-.delete-btn:hover {
-    background: #c82333;
-}
+      .report-details span:not(.report-title) {
+        font-size: 14px;
+        color: #666;
+      }
 
-/* Share Dropdown */
-.share-dropdown {
+      /* Buttons */
+      .upload-button, .view-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .upload-button {
+        background: #2196f3;
+      }
+
+      .upload-button:hover {
+        background: #1976d2;
+      }
+
+      .report-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .view-btn {
+        background: #2196f3;
+        text-decoration: none;
+        padding: 8px 16px;
+      }
+
+      .delete-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .delete-btn:hover {
+        background: #c82333;
+      }
+
+      /*share styling*/
+      .share-dropdown {
     position: relative;
 }
 
 .share-btn {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background: #f0f2f5;
-    border: none;
+    justify-content: center;
     padding: 8px 16px;
+    background: #2196f3;
+    color: white;
+    border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.3s;
 }
 
-.share-options {
+.share-menu {
     position: absolute;
-    right: 0;
     top: 100%;
+    right: 0;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     padding: 8px;
     display: none;
+    min-width: 150px;
     z-index: 100;
-    min-width: 180px;
 }
 
-.share-dropdown:hover .share-options {
-    display: block;
+.share-dropdown:hover .share-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .share-option {
@@ -413,584 +296,343 @@ select {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 4px;
     color: #333;
-    transition: background 0.2s;
-    border-radius: 6px;
 }
 
 .share-option:hover {
-    background: #f0f2f5;
+    background: #f5f5f5;
 }
 
-/* System Panels */
-.system-panel {
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-top: 24px;
-}
-
-.test-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
-
-/* Test Cards */
-.test-card {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.test-card.normal { border-left: 4px solid #4caf50; }
-.test-card.high { border-left: 4px solid #f44336; }
-.test-card.low { border-left: 4px solid #2196f3; }
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .main-content {
-        margin-left: 0;
-    }
-    
-    .upload-form-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    #hospital {
-        width: 100%;
-    }
-    
-    .report-item {
-        flex-direction: column;
-        gap: 16px;
-    }
-    
-    .report-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-
-/* Add to your existing CSS */
-.hamburger-menu {
-    display: none;
-    cursor: pointer;
-    padding: 15px;
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    background: white;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.hamburger-menu span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background: #333;
-    margin: 5px 0;
-    transition: 0.4s;
-}
-
-@media (max-width: 768px) {
-    .hamburger-menu {
-        display: block;
-    }
-    
-    .sidebar {
-        transform: translateX(-100%);
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        z-index: 999;
-        transition: 0.3s;
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-    }
-}
+.share-option.gmail:hover { color: #EA4335; }
+.share-option.whatsapp:hover { color: #25D366; }
+.share-option.copy:hover { color: #6c757d; }
 
 
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 20px;
+        }
+
+        .report-item {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .report-actions {
+          width: 100%;
+        }
+
+        .view-btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     </style>
-</head>
-<body>
-    
-     <!-- Sidebar -->
-     <div class="sidebar">
-        <div class="search-box">
-            <input type="text" placeholder="Search for a marker">
-        </div>
+  </head>
+  <body>
+    <div id="notification" class="notification"></div>
 
-        <h2>SUMMARY</h2>
-        <div class="summary-item active">
-            <i class="material-icons">error</i> Abnormal
-        </div>
-        <div class="summary-item">
-            <i class="material-icons">warning</i> Outside Optimal Range
-        </div>
-        <div class="summary-item">
-            <i class="material-icons">check_circle</i> Normal
-        </div>
+    <div class="sidebar">
+      <div class="search-box">
+        <input type="text" placeholder="Search for a marker" />
+      </div>
 
-        <h2>BODY SYSTEMS</h2>
-        <div class="body-systems">
-            {% for system, tests in analyzed_data.categories.items %}
-            <div class="body-system-item" data-icon="{{ system }}">
-                <i class="material-icons">
-                    {% if system == 'metabolism' %}local_fire_department
-                    {% elif system == 'nutrition' %}restaurant
-                    {% elif system == 'digestive' %}lunch_dining
-                    {% elif system == 'blood' %}bloodtype
-                    {% elif system == 'heart' %}favorite
-                    {% elif system == 'kidney' %}water_drop
-                    {% elif system == 'immunity' %}shield
-                    {% else %}science{% endif %}
-                </i>
-                {{ system|title }}
-                <span class="test-count">({{ tests|length }})</span>
-            </div>
-            {% endfor %}
+      <h2>SUMMARY</h2>
+      <div class="summary-item active">
+        <i class="material-icons">error</i> Abnormal
+      </div>
+      <div class="summary-item">
+        <i class="material-icons">warning</i> Outside Optimal Range
+      </div>
+      <div class="summary-item">
+        <i class="material-icons">check_circle</i> Normal
+      </div>
+
+      <h2>BODY SYSTEMS</h2>
+      <div class="body-systems">
+        <div class="body-system-item" data-icon="metabolism">
+          <i class="material-icons">local_fire_department</i> Metabolism
         </div>
+        <div class="body-system-item" data-icon="nutrition">
+          <i class="material-icons">restaurant</i> Nutrition
+        </div>
+        <div class="body-system-item" data-icon="digestive">
+          <i class="material-icons">lunch_dining</i> Digestive
+        </div>
+        <div class="body-system-item" data-icon="liver">
+          <i class="material-icons">science</i> Liver
+        </div>
+        <div class="body-system-item" data-icon="pancreas">
+          <i class="material-icons">opacity</i> Pancreas
+        </div>
+        <div class="body-system-item" data-icon="adrenal">
+          <i class="material-icons">flash_on</i> Adrenal
+        </div>
+        <div class="body-system-item" data-icon="thyroid">
+          <i class="material-icons">psychology</i> Thyroid
+        </div>
+        <div class="body-system-item" data-icon="reproductive">
+          <i class="material-icons">pregnant_woman</i> Reproductive
+        </div>
+        <div class="body-system-item" data-icon="blood">
+          <i class="material-icons">bloodtype</i> Blood
+        </div>
+        <div class="body-system-item" data-icon="heart">
+          <i class="material-icons">favorite</i> Heart
+        </div>
+        <div class="body-system-item" data-icon="kidney">
+          <i class="material-icons">water_drop</i> Kidney
+        </div>
+        <div class="body-system-item" data-icon="immunity">
+          <i class="material-icons">shield</i> Immunity
+        </div>
+      </div>
     </div>
 
-<!-- Main Content Area -->
-<div class="main-content">
-    <h1>Lab Reports Analysis</h1>
-    <div class="print-section">
-        <button onclick="window.print()" class="print-btn">
-            <i class="material-icons">print</i>
-            Print Report
-        </button>
-    </div>
-    
-    <div class="controls-panel">
-        <div class="filter-group">
-            <select id="systemFilter">
-                <option value="all">All Systems</option>
-                {% for system in body_systems %}
-                    <option value="{{ system }}">{{ system|title }}</option>
-                {% endfor %}
-            </select>
-            <select id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="abnormal">Abnormal</option>
-                <option value="optimal">Outside Optimal</option>
-                <option value="normal">Normal</option>
-            </select>
-        </div>
-        <div class="sort-group">
-            <button class="sort-btn" data-sort="date">Sort by Date</button>
-            <button class="sort-btn" data-sort="severity">Sort by Severity</button>
-        </div>
-    </div>
-    
+    <div class="main-content">
+      <h1>Lab Reports Analysis</h1>
 
-    <!-- Upload Section: Handles new lab report uploads with hospital information -->
-    <div class="upload-section">
-        <form method="POST" enctype="multipart/form-data" id="uploadForm">
-            {% csrf_token %}
-            <div class="upload-form-group">
-                <label for="hospital" class="hospital-label">Hospital Name:</label>
-                <input type="text" id="hospital" name="hospital" required>
-                <label for="lab-file" class="upload-btn">
-                    <i class="material-icons">upload_file</i>
-                    Upload New Lab Report
-                </label>
-                <input type="file" id="lab-file" name="lab_report" accept=".pdf,.doc,.docx" hidden>
-            </div>
+      <div class="upload-section">
+        <form
+          id="uploadForm"
+          class="upload-form"
+          action="{% url 'upload_lab_report' %}"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <div class="input-group">
+            <input
+              type="text"
+              id="hospital"
+              name="hospital"
+              placeholder="Enter Hospital Name"
+              required
+            />
+          </div>
+          <div class="file-upload">
+            <input
+              type="file"
+              id="labReport"
+              name="lab_report"
+              accept=".pdf"
+              class="file-input"
+              required
+            />
+            <label for="labReport" class="file-label">
+              <i class="material-icons">cloud_upload</i>
+              <span>Choose PDF file or drag it here</span>
+            </label>
+            <div class="file-name"></div>
+          </div>
+          <button type="submit" class="upload-button">
+            <i class="material-icons">upload</i>
+            Upload Report
+          </button>
         </form>
-    </div>
-    <div class="summary-dashboard">
-        <div class="summary-card abnormal">
-            <h3>Abnormal Results</h3>
-            <div class="count">{{ analyzed_data.summary.abnormal|length }}</div>
-        </div>
-        <div class="summary-card optimal">
-            <h3>Outside Optimal</h3>
-            <div class="count">{{ analyzed_data.summary.optimal|length }}</div>
-        </div>
-        <div class="summary-card normal">
-            <h3>Normal Results</h3>
-            <div class="count">{{ analyzed_data.summary.normal|length }}</div>
-        </div>
-    </div>
-    
+      </div>
 
-    <!-- Reports List: Displays all uploaded reports with actions -->
-    <div class="reports-container">
-        {% for report_id, data in analyzed_data.items %}
-            {% if report_id != 'categories' %}
-                <div class="report-item" data-report-id="{{ report_id }}">
-                    <!-- Report Details Section -->
-                    <div class="report-details">
-                        <span class="report-title">{{ data.report_info.filename }}</span>
-                        <span>Date Uploaded: {{ data.report_info.date }}</span>
-                        <span>Hospital: {{ data.report_info.hospital }}</span>
-                    </div>
-
-                    <!-- Report Actions: View, Delete, Share options -->
-                    <div class="report-actions">
-                        <a href="/media/{{ data.report_info.file_path }}" target="_blank">View</a>
-                        <button class="delete-btn" onclick="confirmDelete('{{ report_id }}')">
-                            <i class="material-icons">delete</i>
+      <!-- In the reports-container section, update to loop through database records -->
+      <div class="reports-container">
+        {% if lab_reports %}
+            {% for report in lab_reports %}
+            <div class="report-item" data-report-id="{{ report.id }}">
+                <div class="report-details">
+                    <span class="report-title">{{ report.filename }}</span>
+                    <span>Date Uploaded: {{ report.upload_date|date:"Y-m-d" }}</span>
+                    <span>Hospital: {{ report.hospital }}</span>
+                </div>
+                <div class="report-actions">
+                    <a href="{{ report.file_path.url }}" target="_blank" class="view-btn">
+                        <i class="material-icons">visibility</i>
+                        View
+                    </a>
+                    <div class="share-dropdown">
+                        <button class="share-btn">
+                            <i class="material-icons">share</i>
                         </button>
-                        
-                        <!-- Share Options Dropdown -->
-                        <div class="share-dropdown">
-                            <button class="share-btn">
-                                <i class="material-icons">share</i>
-                                Share
+                        <div class="share-menu">
+                            <button onclick="shareViaGmail('{{ report.file_path.url }}')" class="share-option gmail">
+                                <i class="material-icons">mail</i>
+                                Gmail
                             </button>
-                            <div class="share-options">
-                                <!-- Email sharing -->
-                                <a href="mailto:?subject=Lab Report&body=View my lab report: /media/{{ data.report_info.file_path }}" 
-                                   class="share-option email">
-                                    <i class="material-icons" style="color: #EA4335">email</i>
-                                    Email
-                                </a>
-                                <!-- WhatsApp sharing -->
-                                <a href="https://wa.me/?text=View my lab report: /media/{{ data.report_info.file_path }}" 
-                                   target="_blank" class="share-option whatsapp">
-                                    <i class="fab fa-whatsapp" style="color: #25D366"></i>
-                                    WhatsApp
-                                </a>
-                                <!-- SMS sharing -->
-                                <a href="sms:?body=View my lab report: /media/{{ data.report_info.file_path }}" 
-                                   class="share-option sms">
-                                    <i class="material-icons" style="color: #34B7F1">chat</i>
-                                    SMS
-                                </a>
-                                <!-- Copy link option -->
-                                <a href="#" onclick="copyLink(this)" 
-                                   data-link="/media/{{ data.report_info.file_path }}" 
-                                   class="share-option copy">
-                                    <i class="material-icons" style="color: #6c757d">content_copy</i>
-                                    Copy Link
-                                </a>
-                            </div>
+                            <button onclick="shareViaWhatsApp('{{ report.file_path.url }}')" class="share-option whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp
+                            </button>
+                            
+                            <button onclick="copyLink('{{ report.file_path.url }}')" class="share-option copy">
+                                <i class="material-icons">content_copy</i>
+                                Copy Link
+                            </button>
                         </div>
                     </div>
+                    <button class="delete-btn" onclick="confirmDelete('{{ report.id }}')">
+                        <i class="material-icons">delete</i>
+                        Delete
+                    </button>
                 </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-
-    <div class="system-containers">
-        {% for system in body_systems %}
-            <div class="system-panel" data-system="{{ system }}">
-                <h3>{{ system|title }} Analysis</h3>
-                <div class="test-grid">
-                    {% for report_id, data in analyzed_data.items %}
-                        {% if report_id != 'categories' %}
-                            {% with system_tests=data.categories|get_item:system %}
-                                {% if system_tests %}
-                                    {% for test in system_tests %}
-                                    <div class="test-card {{ test.status }}">
-                                        <div class="test-header">
-                                            <h4>{{ test.test }}</h4>
-                                            <span class="status-badge">{{ test.status|title }}</span>
-                                        </div>
-                                        <div class="test-body">
-                                            <div class="value-section">
-                                                <span class="value">{{ test.value }} {{ test.unit }}</span>
-                                                <span class="range">Range: {{ test.range.min }} - {{ test.range.max }}</span>
-                                            </div>
-                                            <div class="clinical-section">
-                                                <h5>Clinical Implications</h5>
-                                                <ul>
-                                                    {% for implication in test.clinical_implications %}
-                                                        <li>{{ implication }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                            <div class="recommendations-section">
-                                                <h5>Recommendations</h5>
-                                                <ul>
-                                                    {% for rec in test.recommendations %}
-                                                        <li>{{ rec }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {% endfor %}
-                                {% endif %}
-                            {% endwith %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                
             </div>
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </div>    
     </div>
-    
-    
-    
-</div>
-  
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        document.getElementById('lab-file').addEventListener('change', function(e) {
-            const formData = new FormData(document.getElementById('uploadForm'));
-            const hospitalName = document.getElementById('hospital').value;
-            
-            if (!hospitalName) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Please enter hospital name',
-                    icon: 'error'
-                });
-                return;
-            }
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            fetch('/upload-lab-report/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    location.reload();
-                }
+          const formData = new FormData();
+          const fileInput = document.getElementById("labReport");
+          const hospitalInput = document.getElementById("hospital");
+
+          formData.append("lab_report", fileInput.files[0]);
+          formData.append("hospital", hospitalInput.value);
+          formData.append(
+            "csrfmiddlewaretoken",
+            document.querySelector("[name=csrfmiddlewaretoken]").value
+          );
+
+          try {
+            const response = await fetch("/upload-lab-report/", {
+              method: "POST",
+              body: formData,
             });
+
+            const data = await response.json();
+            if (data.success) {
+              const newReport = `
+    <div class="report-item" data-report-id="${data.id}">
+        <div class="report-details">
+            <span class="report-title">${data.filename}</span>
+            <span>Date Uploaded: ${data.date}</span>
+            <span>Hospital: ${data.hospital}</span>
+        </div>
+        <div class="report-actions">
+            <a href="${data.file_url}" target="_blank" class="view-btn">
+                <i class="material-icons">visibility</i>
+                View
+            </a>
+            <button class="delete-btn" onclick="confirmDelete(${data.id})">
+                <i class="material-icons">delete</i>
+                Delete
+            </button>
+            <div class="share-buttons">
+        <button class="share-btn gmail" onclick="shareViaGmail('{{ report.file_path.url }}')">
+            <i class="material-icons">mail</i>
+        </button>
+        <button class="share-btn whatsapp" onclick="shareViaWhatsApp('{{ report.file_path.url }}')">
+            <i class="material-icons">whatsapp</i>
+        </button>
+        <button class="share-btn copy" onclick="copyLink('{{ report.file_path.url }}')">
+            <i class="material-icons">content_copy</i>
+        </button>
+    </div>
+        </div>
+    </div>
+`;
+
+              const reportsContainer =
+                document.querySelector(".reports-container");
+              reportsContainer.insertAdjacentHTML("afterbegin", newReport);
+
+              document.getElementById("uploadForm").reset();
+              document.querySelector(".file-name").textContent = "";
+            }
+          } catch (error) {
+            console.error("Upload failed:", error);
+          }
         });
 
-        function copyLink(element) {
-            const link = element.dataset.link;
-            navigator.clipboard.writeText(window.location.origin + link);
+      document
+        .getElementById("labReport")
+        .addEventListener("change", function (e) {
+          const fileName = e.target.files[0]?.name || "No file selected";
+          document.querySelector(".file-name").textContent = fileName;
+        });
+    </script>
+    <!-- Add this in the head section -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Update the JavaScript -->
+    <script>
+      function confirmDelete(reportId) {
+        Swal.fire({
+          title: "Delete Lab Report",
+          text: "Are you sure you want to delete this lab report?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#dc3545",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            deleteReport(reportId);
+          }
+        });
+      }
+
+      async function deleteReport(reportId) {
+    try {
+        const response = await fetch(`/delete-report/${reportId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const reportElement = document.querySelector(`[data-report-id="${reportId}"]`);
+            reportElement.remove();
             
             Swal.fire({
-                title: 'Success',
-                text: 'Link copied to clipboard',
+                title: 'Deleted!',
+                text: 'Lab report has been deleted successfully',
                 icon: 'success',
-                timer: 1500,
+                timer: 2000,
                 showConfirmButton: false
             });
         }
-
-        function confirmDelete(reportId) {
-            Swal.fire({
-                title: 'Delete Report',
-                text: 'Are you sure you want to discard this report?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteReport(reportId);
-                }
-            });
-        }
-
-        function deleteReport(reportId) {
-            fetch(`/delete-report/${reportId}/`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    document.querySelector(`[data-report-id="${reportId}"]`).remove();
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: 'Report has been deleted successfully',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        }
-    </script>
-    <script>
-        document.querySelectorAll('.body-system-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const system = this.dataset.icon;
-                document.querySelectorAll('.system-panel').forEach(panel => {
-                    panel.style.display = panel.dataset.system === system ? 'block' : 'none';
-                });
-                
-                // Update active state
-                document.querySelectorAll('.body-system-item').forEach(el => {
-                    el.classList.remove('active');
-                });
-                this.classList.add('active');
-            });
-        });
-        </script>
-        <style>
-            /* Add these with your existing styles */
-            .body-system-item.active {
-                background-color: #e63946;
-                color: white;
-            }
-        
-            .body-system-item.active i {
-                color: white !important;
-            }
-        
-            .system-panel {
-                display: none;
-            }
-        
-            .system-panel[data-system].active {
-                display: block;
-                animation: fadeIn 0.3s ease-in;
-            }
-        
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        </style>
-        
-        <!-- At the bottom of the file, just before </body> -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const bodySystemItems = document.querySelectorAll('.body-system-item');
-                
-                bodySystemItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        bodySystemItems.forEach(el => el.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        const systemType = this.getAttribute('data-icon');
-                        
-                        document.querySelectorAll('.system-panel').forEach(panel => {
-                            panel.style.display = 'none';
-                            panel.classList.remove('active');
-                        });
-                        
-                        const selectedPanel = document.querySelector(`.system-panel[data-system="${systemType}"]`);
-                        if (selectedPanel) {
-                            selectedPanel.style.display = 'block';
-                            selectedPanel.classList.add('active');
-                        }
-                    });
-                });
-        
-                if (bodySystemItems.length > 0) {
-                    bodySystemItems[0].click();
-                }
-            });
-        </script>
-
-            <script>
-            class LabAnalysisManager {
-                constructor() {
-        const analyzedData = analyzed_data|json_script:"lab-data";
-        const bodySystems = body_systems|json_script:"body-systems";
-        
-        this.data = JSON.parse(document.getElementById('lab-data').textContent);
-        this.systems = JSON.parse(document.getElementById('body-systems').textContent);
-        
-        this.initializeAnalysis();
-        this.setupEventListeners();
+    } catch (error) {
+        console.log('Operation completed, but with response error');
     }
-            
-                initializeAnalysis() {
-                    // Data is already available from the server-side render
-                    const analyzedData = analyzed_data;
-                    const bodySystems = body_systems;
+}
+    </script>
+<script>
+function shareViaGmail(url) {
+    const subject = 'Lab Report';
+    const body = `Check out my lab report: ${url}`;
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+}
 
-                    
-                    this.updateSystemPanels(analyzedData.categories);
-                    this.updateSummaryDashboard(analyzedData.summary);
-                }
-            
-                updateSystemPanels(categories) {
-                    Object.entries(categories).forEach(([system, tests]) => {
-                        const systemPanel = document.querySelector(`[data-system="${system}"]`);
-                        if (systemPanel) {
-                            const testGrid = systemPanel.querySelector('.test-grid');
-                            if (testGrid) {
-                                testGrid.innerHTML = this.generateTestCards(tests);
-                            }
-                        }
-                    });
-                }
-            
-                generateTestCards(tests) {
-                    return tests.map(test => `
-                        <div class="test-card ${test.status}">
-                            <div class="test-header">
-                                <h4>${test.test}</h4>
-                                <span class="status-badge">${test.status}</span>
-                            </div>
-                            <div class="test-body">
-                                <div class="value-section">
-                                    <span class="value">${test.value} ${test.unit}</span>
-                                    <span class="range">Range: ${test.range}</span>
-                                </div>
-                                <div class="clinical-section">
-                                    <h5>Clinical Implications</h5>
-                                    <ul>${test.clinical_implications ? 
-                                        test.clinical_implications.map(imp => `<li>${imp}</li>`).join('') : ''}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            
-                setupEventListeners() {
-                    document.querySelectorAll('.body-system-item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            this.activateSystem(item.dataset.icon);
-                        });
-                    });
-            
-                    // Add filter listeners
-                    document.getElementById('systemFilter')?.addEventListener('change', (e) => {
-                        this.filterBySystem(e.target.value);
-                    });
-            
-                    document.getElementById('statusFilter')?.addEventListener('change', (e) => {
-                        this.filterByStatus(e.target.value);
-                    });
-                }
-            
-                activateSystem(system) {
-                    document.querySelectorAll('.system-panel').forEach(panel => {
-                        panel.style.display = panel.dataset.system === system ? 'block' : 'none';
-                    });
-                    
-                    document.querySelectorAll('.body-system-item').forEach(el => {
-                        el.classList.toggle('active', el.dataset.icon === system);
-                    });
-                }
-            }
-            
-            // Initialize when the page loads
-            document.addEventListener('DOMContentLoaded', () => {
-                window.labAnalysisManager = new LabAnalysisManager();
-            });
-            </script>
-            
-        
-</body>
+function shareViaWhatsApp(url) {
+    const text = `Check out my lab report: ${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+}
+
+function copyLink(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        Swal.fire({
+            title: 'Link Copied!',
+            text: 'Report link has been copied to clipboard',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    });
+}
+</script>
+
+  </body>
+  </body>
 </html>

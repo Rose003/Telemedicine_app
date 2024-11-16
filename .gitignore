@@ -151,6 +151,9 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+health/static/health/videos/*.mp4
+
+
 # Cython debug symbols
 cython_debug/
 

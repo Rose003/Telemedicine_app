@@ -21,8 +21,10 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 import PyPDF2
 from django.core.files.base import ContentFile
-
-
+from collections import defaultdict
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 
 
@@ -237,46 +239,56 @@ def extract_text_from_pdf(file_path):
             text += page.extract_text()
     return text
 
+from django.shortcuts import render
+from .utils import LabReportAnalyzer
+import PyPDF2
+from .models import HealthLabreport
+from django.http import JsonResponse
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.utils import timezone
+import os
+from django.conf import settings
+
 def labs(request):
     analyzer = LabReportAnalyzer()
     lab_reports = HealthLabreport.objects.all().order_by('-upload_date')
-    body_systems = ['blood', 'metabolism', 'nutrition', 'digestive', 'liver', 'heart', 'kidney', 'immunity']
     
-    analyzed_data = { 'categories': {
-        'metabolism': [],
-        'nutrition': [],
-        'digestive': [],
-        'blood': [],
-        'heart': [],
-        'kidney': [],
-        'immunity': []
-    }}
+    analyzed_data = {
+        'categories': defaultdict(list),
+        'summary': {
+            'abnormal': [],
+            'optimal': [],
+            'normal': []
+        }
+    }
     
     for report in lab_reports:
         file_path = os.path.join(settings.MEDIA_ROOT, str(report.file_path))
         text = extract_text_from_pdf(file_path)
+        
         values = analyzer.extract_lab_values(text)
         categories = analyzer.categorize_results(values)
         summary = analyzer.generate_summary(categories)
         
-        analyzed_data[report.id] = {
-            'categories': categories,
-            'summary': summary,
+        analyzed_data[str(report.id)] = {
+            'categories': dict(categories),
+            'summary': dict(summary),
             'report_info': {
                 'filename': report.filename,
                 'hospital': report.hospital,
-                'date': report.upload_date
+                'date': report.upload_date.isoformat(),
+                'file_path': str(report.file_path)
             }
         }
-    
+        
     context = {
         'lab_reports': lab_reports,
-        'analyzed_data': analyzed_data,
-        'body_systems': body_systems
+        'analyzed_data': dict(analyzed_data),
+        'body_systems': list(analyzer.body_systems.keys())
     }
     
     return render(request, 'health/labs.html', context)
-
 
 def upload_lab_report(request):
     if request.method == 'POST':
@@ -290,7 +302,6 @@ def upload_lab_report(request):
             file_path = os.path.join('lab_reports', file.name)
             path = default_storage.save(file_path, ContentFile(file.read()))
             
-            # Create report first
             report = HealthLabreport.objects.create(
                 filename=file.name,
                 file_path=path,
@@ -298,13 +309,11 @@ def upload_lab_report(request):
                 upload_date=timezone.now()
             )
             
-            # Trigger AI analysis for new document
             analyzer = LabReportAnalyzer()
             text = extract_text_from_pdf(os.path.join(settings.MEDIA_ROOT, path))
             values = analyzer.extract_lab_values(text)
             categories = analyzer.categorize_results(values)
             
-            # Store analysis results with the report
             report.analysis_results = json.dumps(categories)
             report.save()
             
@@ -318,12 +327,6 @@ def upload_lab_report(request):
             })
     
     return JsonResponse({'success': False})
-
-
-
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
 
 @csrf_exempt
 @require_http_methods(["DELETE"])
