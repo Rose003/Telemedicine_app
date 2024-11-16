@@ -1,0 +1,124 @@
+{% extends 'health/dashboard_base.html' %}
+{% load static %}
+{% block content %}
+    <div class="doctors-grid">
+        {% for doctor in doctors %}
+        <div class="doctor-card">
+            <img src="{% static 'health/images/doctor1.png' %}" alt="{{ doctor.name }}" class="doctor-image">
+            <h3 class="doctor-name">{{ doctor.name }}</h3>
+            <p class="doctor-spec">{{ doctor.specialization }}</p>
+            <p class="doctor-exp">👨‍⚕️ Experience: {{ doctor.experience }}</p>
+            <button class="btn btn-availability" data-schedule="{{ doctor.schedule|safe }}" data-doctorid="{{ doctor.id }}">View Availability</button>
+            <button class="btn btn-book">Book Now</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="availabilityModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Doctor's Availability</h2>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button id="prevMonth">&lt;</button>
+                    <h3 id="monthDisplay"></h3>
+                    <button id="nextMonth">&gt;</button>
+                </div>
+                <div class="weekdays">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
+                    <div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="calendarDays" class="calendar-days"></div>
+            </div>
+        </div>
+    </div>
+    {% endblock %} 
+
+    {% block extra_js %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const availabilityButtons = document.querySelectorAll('.btn-availability');
+        const modal = document.getElementById('availabilityModal');
+        const closeBtn = document.querySelector('.close');
+
+        availabilityButtons.forEach(button => {
+            button.addEventListener('click', function() {
+    const scheduleData = this.getAttribute('data-schedule');
+    console.log('Schedule data:', scheduleData);
+    
+    // Convert the schedule string to proper JSON format
+    const schedule = scheduleData.replace(/'/g, '"');
+    const availableDates = JSON.parse(schedule);
+    
+    showAvailability(availableDates);
+    modal.style.display = 'block';
+});
+        });
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    });
+
+    function showAvailability(schedule) {
+        initCalendar(schedule);
+    }
+
+    function initCalendar(schedule) {
+    const calendar = document.getElementById('calendarDays');
+    const monthDisplay = document.getElementById('monthDisplay');
+    let currentDate = new Date();
+    
+    function renderCalendar() {
+        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        
+        monthDisplay.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`;
+        calendar.innerHTML = '';
+        
+        for(let i = 0; i < firstDay.getDay(); i++) {
+            calendar.innerHTML += '<div></div>';
+        }
+        
+        for(let day = 1; day <= lastDay.getDate(); day++) {
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const dayName = date.toLocaleString('en-us', {weekday: 'long'});
+            const availableTimes = schedule[dayName] || [];
+            const isAvailable = availableTimes.length > 0;
+            
+            calendar.innerHTML += `
+                <div class="calendar-day ${isAvailable ? 'available' : ''}" 
+                     ${isAvailable ? `data-times='${JSON.stringify(availableTimes)}'` : ''}>
+                    <span>${day}</span>
+                    ${isAvailable ? `<div class="time-slots">${availableTimes.join('<br>')}</div>` : ''}
+                </div>
+            `;
+        }
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+    
+    renderCalendar();
+}
+
+
+    </script>
+{% endblock %}
+
+
+

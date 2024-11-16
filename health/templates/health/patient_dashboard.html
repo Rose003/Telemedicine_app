@@ -1,0 +1,916 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Patient Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="{% static 'health/css/dashboard.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+      <span></span>
+      <span></span>
+      <span></span>
+  </button>  
+    <div class="sidebar">
+      <img src="{% static 'health/images/logo1.png' %}" alt="Logo" />
+      <!-- In the sidebar -->
+<a href="#" class="active" data-translate>Home</a>
+<a href="#" data-translate>Appointment</a>
+<a href="{% url 'doctors' %}">Doctor</a>
+<a href="{% url 'labs' %}" data-translate>Labs & Medical Tests</a>
+<a href="#" data-translate>Medicine</a>
+<a href="#" data-translate>Prescription</a>
+<a href="#" data-translate>Health Record</a>
+<div class="dropdown">
+    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+        <span class="language-text">Language</span> 
+        <span class="selected-lang">🌐 English</span>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" data-lang="en">🇬🇧 English</a></li>
+        <li><a class="dropdown-item" href="#" data-lang="sw">🇰🇪 Kiswahili</a></li>
+    </ul>
+</div>
+
+<a href="#" data-translate>Support</a>
+      <a href="#" style="color: #e63946">Sign Out</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content" style="flex: 1; padding: 24px">
+     <!-- Top Navigation -->
+<nav class="top-nav">
+  <!-- Separate the user greeting into its own container -->
+<div class="nav-content">
+  <div class="profile-section">
+      <img src="{% static 'health/images/heart.png' %}" alt="User Profile" class="profile-image"/>
+  </div>
+
+  <div class="search-container">
+      <div class="input-group">
+          <span class="input-group-text">
+              <i class="fas fa-search"></i>
+          </span>
+          <input type="text" class="form-control" placeholder="Search tasks, appointments or doctors..." data-translate-placeholder="Search tasks, appointments or doctors..."/>
+      </div>
+  </div>
+
+  <!-- Isolate the greeting section -->
+ <!-- Update the greeting section with controlled expansion -->
+<div class="user-greeting">
+  <div class="greeting-content">
+      <h2 data-translate>Hello, Rose</h2>
+      <div class="mood-selector" id="moodSelector">
+          How are you feeling today?
+          <div class="mood-emojis">
+              <span class="emoji-btn" data-mood="great" title="Great">😊</span>
+              <span class="emoji-btn" data-mood="good" title="Good">🙂</span>
+              <span class="emoji-btn" data-mood="okay" title="Okay">😐</span>
+              <span class="emoji-btn" data-mood="notGood" title="Not Good">😕</span>
+              <span class="emoji-btn" data-mood="unwell" title="Unwell">😷</span>
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+</nav>
+      <!-- Health Stats -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <img src="{% static 'health/images/heart.png' %}" alt="Heart Rate" />
+          <b data-translate>Heart Rate</b>
+          <strong>90 BPM</strong>
+        </div>
+        <div class="stat-card">
+          <img src="{% static 'health/images/weight.png' %}" alt="Weight" />
+          <b data-translate>Total Weight</b>
+          <strong>65 KG</strong>
+        </div>
+        <div class="stat-card">
+          <img
+            src="{% static 'health/images/bloodcells.png' %}"
+            alt="Blood Cells"
+          />
+          <b data-translate>Blood Cells</b>
+          <strong>1200 UL</strong>
+        </div>
+        <div class="stat-card">
+          <img
+            src="{% static 'health/images/calories.png' %}"
+            alt="Calorie Burn"
+          />
+          <b data-translate>Calorie Burn</b>
+          <strong>2200 kcal</strong>
+        </div>
+      </div>
+
+      <!-- BMI Gauge Section -->
+      <div
+        class="bmi-container"
+        style="display: flex; gap: 24px; margin-top: 24px"
+      >
+        <!-- Left side BMI Calculator remains the same -->
+        <!-- BMI Calculator (Left Side) -->
+        <div
+          class="bmi-calculator"
+          style="flex: 1; height: 100%; max-width: 50%"
+        >
+          <h2>Calculate BMI</h2>
+          <form method="post" action="{% url 'calculate_bmi' %}">
+            {% csrf_token %}
+            <input type="text" name="weight" id="weight" placeholder="Weight (kg)" required />
+            <input type="text" name="height" id="height" placeholder="Height (cm)" required />
+            <input type="text" name="sex" id="sex" placeholder="Sex (m/f)" required />
+            <input type="text" name="age" id="age" placeholder="Age" required />
+            <input type="text" name="waist" id="waist" placeholder="Waist (cm)" />
+            <input type="text" name="hip" id="hip" placeholder="Hip (cm)" />
+            <button type="submit">Calculate BMI</button>
+        </form>     
+
+          {% if bmi_data %}
+          <div style="margin-top: 24px">
+            <p><strong>BMI:</strong> {{ bmi_data.bmi.value }}</p>
+            <p><strong>Category:</strong> {{ bmi_data.bmi.status }}</p>
+            <p><strong>Health Risk:</strong> {{ bmi_data.bmi.risk }}</p>
+            <p>
+              <strong>Ideal Weight:</strong> {{ bmi_data.ideal_weight.lower }} -
+              {{ bmi_data.ideal_weight.upper }} kg
+            </p>
+            <p><strong>Surface Area:</strong> {{ bmi_data.surface_area }} m²</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Enhanced BMI Gauge (Right Side) -->
+        <div
+          class="bmi-gauge-container"
+          style="flex: 1; position: relative; height: auto"
+        >
+          <!-- Semi-circle gauge -->
+          <div
+            class="semi-circle"
+            style="
+              width: 100%;
+              height: 150px;
+              background: linear-gradient(
+                  90deg,
+                  #2e7d32 0%,
+                  #388e3c 8%,
+                  #43a047 16%,
+                  #4caf50 24%,
+                  #66bb6a 32%,
+                  #fff176 40%,
+                  #ffee58 48%,
+                  #fdd835 56%,
+                  #ffa726 64%,
+                  #ff7043 72%,
+                  #ff5722 80%,
+                  #f44336 88%,
+                  #d32f2f 96%
+                ),
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 7.69%,
+                  rgba(255, 255, 255, 0.2) 7.69%,
+                  rgba(255, 255, 255, 0.2) 7.7%
+                );
+              border-radius: 150px 150px 0 0;
+              position: relative;
+              overflow: hidden;
+              border: 2px solid #fff;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <!-- Gauge Arrow -->
+            <div
+              id="bmiArrow"
+              data-bmi="{{ bmi_data.bmi.value|default:20 }}"
+              style="
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 4px;
+                height: 145px;
+                background: #333;
+                transform-origin: bottom center;
+                transform: rotate(-90deg);
+                transition: transform 1s ease-out;
+                z-index: 1;
+              "
+            >
+              <div
+                style="
+                  position: absolute;
+                  top: 0;
+                  left: -6px;
+                  width: 0;
+                  height: 0;
+                  border-left: 8px solid transparent;
+                  border-right: 8px solid transparent;
+                  border-bottom: 16px solid #333;
+                "
+              ></div>
+            </div>
+          </div>
+          <!-- Central BMI Display with Status -->
+          <div
+            class="bmi-value-status"
+            style="
+              background: white;
+              padding: 20px;
+              border-radius: 12px;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+              margin-bottom: 20px;
+            "
+          >
+            <!-- BMI Value -->
+            <div style="text-align: center">
+              <span style="font-size: 32px; font-weight: bold; display: block"
+                >{{ bmi_data.bmi.value|default:"--" }}</span
+              >
+              <span style="font-size: 16px; color: #666">BMI</span>
+            </div>
+
+            <!-- Vertical Divider -->
+            <div
+              style="
+                width: 1px;
+                height: 50px;
+                background: #e0e0e0;
+                margin: 0 20px;
+              "
+            ></div>
+
+            <!-- Status -->
+            <div style="text-align: left">
+              <p style="font-size: 16px; margin-bottom: 5px">
+                Status:
+                <strong
+                  >{{ bmi_data.bmi.status|default:"Not Calculated" }}</strong
+                >
+              </p>
+              <p style="font-size: 14px; color: #666">
+                {{ bmi_data.bmi.risk|default:"Calculate your BMI" }}
+              </p>
+            </div>
+          </div>
+
+          <!-- BMI Categories Legend -->
+          <div
+            class="bmi-legend"
+            style="
+              width: 100%;
+              display: grid;
+              grid-template-columns: repeat(5, 1fr);
+              gap: 15px;
+              padding: 20px;
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <div class="legend-item" style="text-align: center">
+              <div
+                style="
+                  width: 20px;
+                  height: 20px;
+                  background: #4caf50;
+                  border-radius: 50%;
+                  margin: 0 auto 8px;
+                "
+              ></div>
+              <span style="font-size: 12px; line-height: 1.2"
+                >Underweight<br />&lt;18.5</span
+              >
+            </div>
+            <div class="legend-item" style="text-align: center">
+              <div
+                style="
+                  width: 20px;
+                  height: 20px;
+                  background: #8bc34a;
+                  border-radius: 50%;
+                  margin: 0 auto 8px;
+                "
+              ></div>
+              <span style="font-size: 12px; line-height: 1.2"
+                >Normal<br />18.5-24.9</span
+              >
+            </div>
+            <div class="legend-item" style="text-align: center">
+              <div
+                style="
+                  width: 20px;
+                  height: 20px;
+                  background: #ffeb3b;
+                  border-radius: 50%;
+                  margin: 0 auto 8px;
+                "
+              ></div>
+              <span style="font-size: 12px; line-height: 1.2"
+                >Overweight<br />25-29.9</span
+              >
+            </div>
+            <div class="legend-item" style="text-align: center">
+              <div
+                style="
+                  width: 20px;
+                  height: 20px;
+                  background: #ff9800;
+                  border-radius: 50%;
+                  margin: 0 auto 8px;
+                "
+              ></div>
+              <span style="font-size: 12px; line-height: 1.2"
+                >Obese<br />30-34.9</span
+              >
+            </div>
+            <div class="legend-item" style="text-align: center">
+              <div
+                style="
+                  width: 20px;
+                  height: 20px;
+                  background: #f44336;
+                  border-radius: 50%;
+                  margin: 0 auto 8px;
+                "
+              ></div>
+              <span style="font-size: 12px; line-height: 1.2"
+                >Severe<br />35+</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 24px; margin-top: 24px;">
+        <!-- Recent Doctors Container -->
+        <div class="doctor-container" style="flex: 1;">
+            <h2>Recent Doctors</h2>
+            <div class="doctor">
+                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Bessie Cooper" />
+                <div class="doctor-info">
+                    <h3>Dr. Bessie Cooper</h3>
+                    <p>Cardiologist</p>
+                    <div class="rating">
+                        <span>⭐⭐⭐⭐⭐</span> <span>4.8 (5.6K Reviews)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="doctor">
+                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Savannah Nguyen" />
+                <div class="doctor-info">
+                    <h3>Dr. Savannah Nguyen</h3>
+                    <p>Optometry</p>
+                    <div class="rating">
+                        <span>⭐⭐⭐⭐⭐</span> <span>5.0 (5.2K Reviews)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="doctor">
+                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Theresa Webb">
+                <div class="doctor-info">
+                    <h3>Dr. Theresa Webb</h3>
+                    <p>Dentist</p>
+                    <div class="rating">
+                        <span>⭐⭐⭐⭐⭐</span> <span>4.9 (5.1K Reviews)</span>
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="explore-more">Explore More</a>
+        </div>
+    
+       <!-- Calendar Container -->
+<div class="calendar-container">
+  <div class="calendar-header">
+      <h2 id="monthYear"></h2>
+      <div class="calendar-actions">
+          <button class="calendar-nav-btn" id="prevMonth">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+          </button>
+          <button class="calendar-nav-btn" id="nextMonth">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+          </button>
+      </div>
+  </div>
+
+  <div class="calendar" id="calendar"></div>
+
+  <button class="add-appointment-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Add New Appointment
+  </button>
+</div>
+
+    </div>
+
+    <!-- Add this after the progress tracker -->
+<div class="ai-insights">
+    <div class="insights-header">
+        <h2>Personalized Health Insights</h2>
+        <div class="refresh-insights">
+            <span>Updated just now</span>
+            <button id="refreshInsights">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="insights-grid">
+        <div class="insight-card nutrition">
+            <div class="card-header">
+                <img src="{% static 'health/images/nutrition.png' %}" alt="Nutrition">
+                <h3>Nutrition Recommendations</h3>
+            </div>
+            <div class="card-content" id="nutritionInsights">
+                <!-- AI-generated nutrition content will go here -->
+            </div>
+        </div>
+
+        <div class="insight-card exercise">
+            <div class="card-header">
+                <img src="{% static 'health/images/exercise.png' %}" alt="Exercise">
+                <h3>Activity Suggestions</h3>
+            </div>
+            <div class="card-content" id="exerciseInsights">
+                <!-- AI-generated exercise content will go here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Section -->
+<div class="chatbot-container">
+    <div class="chat-header">
+        <img src="{% static 'health/images/heart.png' %}" alt="Health Assistant" />
+        <h3>Health Assistant</h3>
+        <button class="minimize-chat">−</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot">
+            <img src="{% static 'health/images/heart.png' %}" alt="Bot" />
+            <p>Hello! I'm your health assistant. How can I help you today?</p>
+        </div>
+    </div>
+    <div class="chat-input">
+        <label for="fileUpload" class="file-upload-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2"/>
+                <polyline points="17 8 12 3 7 8" stroke-width="2"/>
+                <line x1="12" y1="3" x2="12" y2="15" stroke-width="2"/>
+            </svg>
+        </label>
+        <input type="file" id="fileUpload" hidden />
+        <input type="text" id="userInput" placeholder="Type your health question..." />
+        <button id="sendMessage">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+    
+</div>
+
+
+<!-- Add this script to control mood selection -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const moodSelector = document.getElementById('moodSelector');
+  const emojis = document.querySelectorAll('.emoji-btn');
+  
+  // Store selected mood
+  let selectedMood = localStorage.getItem('userMood') || null;
+  
+  emojis.forEach(emoji => {
+      emoji.addEventListener('click', function() {
+          // Remove active class from all emojis
+          emojis.forEach(e => e.classList.remove('active'));
+          
+          // Add active to selected emoji
+          this.classList.add('active');
+          
+          // Store selection
+          selectedMood = this.dataset.mood;
+          localStorage.setItem('userMood', selectedMood);
+      });
+  });
+  
+  // Apply stored mood if exists
+  if (selectedMood) {
+      const storedEmoji = document.querySelector(`[data-mood="${selectedMood}"]`);
+      if (storedEmoji) {
+          storedEmoji.classList.add('active');
+      }
+  }
+});
+</script>
+
+
+
+
+<script>
+   // Remove any form submit event listeners and keep only these essential functions
+function formatLastUpdated() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `Updated at ${hours}:${minutes}`;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function formatLastUpdated() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `Updated at ${hours}:${minutes}`;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function fetchHealthInsights() {
+    const bmiValue = document.getElementById('bmiArrow').dataset.bmi;
+    // Show loading state
+    document.getElementById('nutritionInsights').innerHTML = '<div class="loading">Loading nutrition insights...</div>';
+    document.getElementById('exerciseInsights').innerHTML = '<div class="loading">Loading exercise insights...</div>';
+
+    fetch('/get-health-insights/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({bmi: bmiValue}),
+        // Add timeout of 3 minutes
+        timeout: 180000
+    })
+    .then(response => response.json())
+    .then(data => {
+        const nutritionHtml = data.nutrition ? `
+            <ul class="insights-list">
+                ${data.nutrition.split('.').filter(item => item.trim()).map(item => 
+                    `<li>${item.trim()}.</li>`
+                ).join('')}
+            </ul>
+        ` : 'Loading nutrition insights...';
+        
+        const exerciseHtml = data.exercise ? `
+            <ul class="insights-list">
+                ${data.exercise.split('.').filter(item => item.trim()).map(item => 
+                    `<li>${item.trim()}.</li>`
+                ).join('')}
+            </ul>
+        ` : 'Loading exercise insights...';
+
+        document.getElementById('nutritionInsights').innerHTML = nutritionHtml;
+        document.getElementById('exerciseInsights').innerHTML = exerciseHtml;
+        document.querySelector('.refresh-insights span').textContent = formatLastUpdated();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+// Event Listeners
+document.getElementById('refreshInsights').addEventListener('click', fetchHealthInsights);
+document.addEventListener('DOMContentLoaded', fetchHealthInsights);
+    </script>
+    
+
+
+    
+<script>
+    class Calendar {
+      constructor() {
+          this.monthNames = ["January", "February", "March", "April", "May", "June",
+              "July", "August", "September", "October", "November", "December"];
+          this.weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          this.currentDate = new Date();
+          this.selectedDate = null;
+          this.appointments = new Map(); // Store appointments data
+      }
+  
+      generateCalendar(year, month) {
+          const calendar = document.getElementById('calendar');
+          const monthYear = document.getElementById('monthYear');
+          
+          calendar.innerHTML = '';
+          monthYear.textContent = `${this.monthNames[month]} ${year}`;
+  
+          // Generate weekday headers
+          this.weekdays.forEach((day, index) => {
+              const dayHeader = document.createElement('div');
+              dayHeader.classList.add('day', 'day-header');
+              dayHeader.textContent = day;
+              if (index === 0 || index === 6) dayHeader.classList.add('weekend');
+              calendar.appendChild(dayHeader);
+          });
+  
+          const firstDay = new Date(year, month, 1).getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const today = new Date();
+  
+          // Add empty days
+          for (let i = 0; i < firstDay; i++) {
+              calendar.appendChild(this.createDayElement());
+          }
+  
+          // Generate month days
+          for (let day = 1; day <= daysInMonth; day++) {
+              const currentDate = new Date(year, month, day);
+              const dayElement = this.createDayElement(day, currentDate);
+              
+              // Add weekend class
+              if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+                  dayElement.classList.add('weekend');
+              }
+  
+              // Handle past dates
+              if (currentDate < new Date(today.setHours(0,0,0,0))) {
+                  dayElement.classList.add('past-date');
+              } else {
+                  this.addDayClickListener(dayElement, currentDate);
+              }
+  
+              // Mark today
+              if (this.isToday(currentDate)) {
+                  dayElement.classList.add('today');
+              }
+  
+              // Mark if has appointment
+              if (this.appointments.has(currentDate.toDateString())) {
+                  dayElement.classList.add('has-appointment');
+              }
+  
+              calendar.appendChild(dayElement);
+          }
+  
+          this.setupNavigationListeners(year, month);
+      }
+  
+      createDayElement(day = '', date = null) {
+          const element = document.createElement('div');
+          element.classList.add('day');
+          element.textContent = day;
+          if (date) {
+              element.setAttribute('data-date', date.toDateString());
+          }
+          return element;
+      }
+  
+      addDayClickListener(element, date) {
+          element.addEventListener('click', () => {
+              document.querySelectorAll('.day.selected').forEach(el => 
+                  el.classList.remove('selected'));
+              element.classList.add('selected');
+              this.selectedDate = date;
+              this.handleDateSelection(date);
+          });
+      }
+  
+      setupNavigationListeners(year, month) {
+          document.getElementById('prevMonth').addEventListener('click', () => {
+              month--;
+              if (month < 0) {
+                  month = 11;
+                  year--;
+              }
+              this.generateCalendar(year, month);
+          });
+  
+          document.getElementById('nextMonth').addEventListener('click', () => {
+              month++;
+              if (month > 11) {
+                  month = 0;
+                  year++;
+              }
+              this.generateCalendar(year, month);
+          });
+      }
+  
+      handleDateSelection(date) {
+          // Custom handler for date selection
+          console.log('Selected date:', date.toDateString());
+          // Add your custom logic here
+      }
+  
+      isToday(date) {
+          const today = new Date();
+          return date.toDateString() === today.toDateString();
+      }
+  
+      addAppointment(date, details) {
+          this.appointments.set(date.toDateString(), details);
+          this.generateCalendar(date.getFullYear(), date.getMonth());
+      }
+  
+      init() {
+          this.generateCalendar(this.currentDate.getFullYear(), this.currentDate.getMonth());
+          
+          // Add appointment button listener
+          document.querySelector('.add-appointment-btn').addEventListener('click', () => {
+              if (this.selectedDate) {
+                  // Handle new appointment creation
+                  console.log('Creating appointment for:', this.selectedDate.toDateString());
+                  // Add your appointment creation logic here
+              }
+          });
+      }
+  }
+  
+  // Initialize calendar
+  document.addEventListener('DOMContentLoaded', () => {
+      const calendar = new Calendar();
+      calendar.init();
+  });
+</script>  
+        <!-- Updated JavaScript for Gauge Animation -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const arrow = document.getElementById('bmiArrow');
+            const bmi = parseFloat(arrow.dataset.bmi) || 20;
+
+            // Convert BMI to angle (15-40 BMI range maps to -90 to 90 degrees)
+            const minBMI = 15;
+            const maxBMI = 40;
+            const minAngle = -90;
+            const maxAngle = 90;
+
+            const angle = ((bmi - minBMI) / (maxBMI - minBMI)) * (maxAngle - minAngle) + minAngle;
+            arrow.style.transform = `rotate(${angle}deg)`;
+        });
+      </script>
+      <script>
+        // Handle sidebar toggle for mobile
+        function toggleSidebar() {
+          const sidebar = document.querySelector(".sidebar");
+          sidebar.classList.toggle("active");
+        }
+      </script>
+
+
+     <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendMessage');
+    const minimizeButton = document.querySelector('.minimize-chat');
+    const chatContainer = document.querySelector('.chatbot-container');
+    const fileUpload = document.getElementById('fileUpload');
+
+    function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        
+        if (!isUser) {
+            const img = document.createElement('img');
+            img.src = "{% static 'health/images/heart.png' %}";
+            img.alt = "Bot";
+            messageDiv.appendChild(img);
+        }
+        
+        const p = document.createElement('p');
+        p.textContent = message;
+        messageDiv.appendChild(p);
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleUserMessage() {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage(message, true);
+            userInput.value = '';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing';
+            typingDiv.innerHTML = '<p>Typing...</p>';
+            chatMessages.appendChild(typingDiv);
+            
+            fetch('/chatbot-response/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    message: message,
+                    context: 'health'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatMessages.removeChild(typingDiv);
+                addMessage(data.message);
+            })
+            .catch(error => {
+                console.log('Error:', error);
+                chatMessages.removeChild(typingDiv);
+                addMessage("I'm here to help with your health questions. What would you like to know?");
+            });
+        }
+    }
+
+    function handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            addMessage(`📎 Uploaded: ${file.name}`, true);
+
+            fetch('/upload-file/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage(`File processed: ${data.message}`);
+            })
+            .catch(error => {
+                addMessage("File uploaded successfully. I can help analyze its contents.");
+            });
+        }
+    }
+
+    function toggleChat() {
+        const messages = chatMessages.style;
+        const input = document.querySelector('.chat-input').style;
+        
+        if (messages.display === 'none') {
+            messages.display = 'flex';
+            input.display = 'flex';
+            minimizeButton.textContent = '−';
+            chatContainer.style.height = '500px';
+        } else {
+            messages.display = 'none';
+            input.display = 'none';
+            minimizeButton.textContent = '+';
+            chatContainer.style.height = 'auto';
+        }
+    }
+
+    // Event Listeners
+    sendButton.addEventListener('click', handleUserMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleUserMessage();
+    });
+    fileUpload.addEventListener('change', handleFileUpload);
+    minimizeButton.addEventListener('click', toggleChat);
+});
+</script>
+
+    </div>
+  </body>
+</html>

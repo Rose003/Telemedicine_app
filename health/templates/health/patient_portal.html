@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f9f9f9;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar img {
+            width: 50px;
+            margin-bottom: 20px;
+        }
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #f0f8ff;
+            color: #007bff;
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .top-nav input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 120px;
+        }
+        .main-content, .right-sidebar {
+            margin-top: 20px;
+        }
+        .main-content h2, .right-sidebar h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .right-sidebar {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .doctor-list, .appointment {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .doctor-card, .appointment-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .doctor-card img, .appointment-card img {
+            width: 50px;
+            border-radius: 50%;
+        }
+        .footer-chat {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .footer-chat:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="logo1.png" alt="Logo">
+        <a href="#" class="active">Home</a>
+        <a href="#">Appointment</a>
+        <a href="#">Schedule</a>
+        <a href="{% url 'doctors' %}">Doctor</a>
+        <a href="#">Labs</a>
+        <a href="#">Medicine</a>
+        <a href="#">Medical Test</a>
+        <a href="#">Prescription</a>
+        <a href="#">Health Record</a>
+        <a href="#">General</a>
+        <a href="#">Language</a>
+        <a href="#">Support</a>
+        <a href="#" style="color: #e63946;">Sign Out</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="top-nav">
+            <input type="text" placeholder="Search Task, appointment or doctor name">
+            <img src="user-icon.png" alt="User" width="40">
+        </div>
+        
+        <!-- Health Stats -->
+        <div class="stats-container">
+            <div class="stat-card">Heart Rate<br><strong>90 BPM</strong></div>
+            <div class="stat-card">Total Weight<br><strong>65 KG</strong></div>
+            <div class="stat-card">Blood Cells<br><strong>1200 UL</strong></div>
+            <div class="stat-card">Calorie Burn<br><strong>2200 kcal</strong></div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <h2>Regular Checkup Schedule</h2>
+            <div class="appointment">
+                <div class="appointment-card">
+                    <img src="doctor1.jpg" alt="Doctor">
+                    <div>
+                        <strong>Dr. Dianne Russell</strong><br>
+                        Cardiologist<br>
+                        <small>Appointment: 10:00 AM</small>
+                    </div>
+                </div>
+                <div class="appointment-card">
+                    <img src="doctor2.jpg" alt="Doctor">
+                    <div>
+                        <strong>Dr. Devon Lane</strong><br>
+                        Optometry<br>
+                        <small>Appointment: 2:00 PM</small>
+                    </div>
+                </div>
+                <div class="appointment-card">
+                    <img src="doctor3.jpg" alt="Doctor">
+                    <div>
+                        <strong>Dr. Kathryn Murphy</strong><br>
+                        Cardiologist<br>
+                        <small>Appointment: 8:00 PM</small>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Explore Departments</h2>
+            <div class="departments">
+                <div class="stat-card">Cardiologist</div>
+                <div class="stat-card">Dentist</div>
+                <div class="stat-card">Neurologist</div>
+                <div class="stat-card">Psychologist</div>
+                <div class="stat-card">Orthopedic</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+        <h2>Need Doctor Consultation?</h2>
+        <div class="calendar">
+            <input type="date" />
+        </div>
+        <button>Add New Appointment</button>
+        
+        <h2>Popular Doctors</h2>
+        <div class="doctor-list">
+            <div class="doctor-card">
+                <img src="doctor4.jpg" alt="Doctor">
+                <div>
+                    <strong>Dr. Bessie Cooper</strong><br>
+                    Cardiologist
+                </div>
+            </div>
+            <div class="doctor-card">
+                <img src="doctor5.jpg" alt="Doctor">
+                <div>
+                    <strong>Dr. Savannah Nguyen</strong><br>
+                    Optometry
+                </div>
+            </div>
+            <div class="doctor-card">
+                <img src="doctor6.jpg" alt="Doctor">
+                <div>
+                    <strong>Dr. Theresa Webb</strong><br>
+                    Dentist
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-chat">
+            <span>Chat with AI Doctor</span>
+        </div>
+    </div>
+</body>
+</html>

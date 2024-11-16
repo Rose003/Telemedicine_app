@@ -1,0 +1,189 @@
+{% extends 'health/base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'health/css/styles.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+<style>
+    :root {
+    --primary-dark: #0C2340;    /* Original dark navy */
+    --primary-light: #1B3B66;   /* Lighter navy */
+    --primary-accent: #2C5494;  /* Even lighter navy for hover states */
+    --text-color: #333;
+    --error-color: #ff6b6b;
+}
+
+
+
+.login-btn:hover {
+    background: var(--primary-accent);
+}
+
+
+.login-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin: 150px auto;  /* Increased margin from 40px to 120px */
+    min-height: 600px;   /* Added minimum height */
+}
+
+
+    .login-banner {
+        flex: 1;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+        padding: 40px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "health/images/doctor2.png" %}') center/cover;
+        opacity: 0.1;
+    }
+
+    .banner-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .banner-content h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .banner-content p {
+        font-size: 1.1em;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    .login-form-container {
+        flex: 1;
+        padding: 60px 40px;
+        background: white;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .login-header h2 {
+        color: var(--text-color);
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 2px solid #e1e1e1;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-light);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            flex-direction: column;
+            margin: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-banner">
+        <div class="banner-content">
+            <h1>AfyaNyumbani</h1>
+            <p>Welcome back! Access your healthcare dashboard to manage patients, appointments, and medical records efficiently.</p>
+        </div>
+    </div>
+    <div class="login-form-container">
+        <div class="login-header">
+            <h2>Sign In</h2>
+            <p>Enter your credentials to continue</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
