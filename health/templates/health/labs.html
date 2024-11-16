@@ -355,19 +355,25 @@
     background: white;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 15px;
+    margin-top: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    display: none;
 }
 
 .result-item {
+    display: flex;
     padding: 10px;
-    border-bottom: 1px solid #eee;
+    border-left: 4px solid;
+    margin: 5px 0;
+}
+.result-item.abnormal {
+    border-color: #ff4b4b;
+    background: #fff5f5;
 }
 
-.result-item.abnormal { background-color: #fff5f5; }
-.result-item.optimal { background-color: #f0fff4; }
-
+.result-item.normal {
+    border-color: #4caf50;
+    background: #f5fff5;
+}
 .recommendations {
     margin-top: 8px;
     font-size: 14px;
@@ -595,7 +601,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-   document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
     // File upload handling
     const uploadForm = document.getElementById('uploadForm');
     const fileInput = document.getElementById('labReport');
@@ -625,7 +631,7 @@
             const data = await response.json();
             if(data.success) {
                 const newReport = `
-                    <div class="report-item" data-report-id="${data.id}">
+                    <div class="report-item" data-report-id="${data.id}" data-analysis='${JSON.stringify(data.analysis)}'>
                         <div class="report-details">
                             <span class="report-title">${data.filename}</span>
                             <span>Date Uploaded: ${data.date}</span>
@@ -698,16 +704,43 @@
     const bodySystemItems = document.querySelectorAll('.body-system-item');
     bodySystemItems.forEach(item => {
         item.addEventListener('click', function() {
-            bodySystemItems.forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
+            const systemType = this.dataset.icon;
+            console.log('Selected system:', systemType);
+
             
-            const selectedSystem = this.dataset.icon;
-            document.querySelectorAll('.analysis-card').forEach(card => {
-                card.style.display = 'none';
-            });
+            // Clear previous results
+            const resultsContainer = document.querySelector('.analysis-results-container');
+            resultsContainer.innerHTML = '';
             
-            document.querySelectorAll(`.analysis-card[data-system="${selectedSystem}"]`).forEach(card => {
-                card.style.display = 'block';
+            // Get analysis data from reports
+            document.querySelectorAll('.report-item').forEach(report => {
+                console.log('Report data-analysis:', report.dataset.analysis);
+                const analysisData = JSON.parse(report.dataset.analysis);
+                console.log('Parsed analysis data:', analysisData);
+
+                const systemResults = analysisData.categories?.[systemType] || [];
+                console.log('System results:', systemResults);
+
+                
+                if (systemResults.length > 0) {
+                    const resultsHTML = `
+                        <div class="analysis-card">
+                            <h3>${report.querySelector('.report-title').textContent}</h3>
+                            <div class="results-list">
+                                ${systemResults.map(result => `
+                                    <div class="result-item ${result.status}">
+                                        <div class="test-info">
+                                            <span class="test-name">${result.test}</span>
+                                            <span class="test-value">${result.value} ${result.unit}</span>
+                                        </div>
+                                        <div class="status-indicator"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    resultsContainer.insertAdjacentHTML('beforeend', resultsHTML);
+                }
             });
         });
     });

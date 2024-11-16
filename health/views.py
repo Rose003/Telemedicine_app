@@ -263,6 +263,7 @@ def labs(request):
         # Use analyze_with_ai instead of extract_lab_values
         analysis = analyzer.analyze_with_ai(text)
         analyzed_data[str(report.id)] = analysis
+        print(f"Analysis for report {report.id}: {analyzed_data[str(report.id)]}")  # Debug print
     
     context = {
         'lab_reports': lab_reports,
@@ -295,7 +296,10 @@ def upload_lab_report(request):
             analyzer = LabReportAnalyzer()
             text = extract_text_from_pdf(os.path.join(settings.MEDIA_ROOT, path))
             analysis = analyzer.analyze_with_ai(text)
-            
+
+            # Store analysis results in the report object
+            report.analysis_results = json.dumps(analysis)
+            report.save()       
             return JsonResponse({
                 'success': True,
                 'id': report.id,

@@ -67,61 +67,50 @@ class LabReportAnalyzer:
 
     def analyze_with_ai(self, text):
         logger.info("Starting AI analysis")
-        try:
-            text_content = str(text) if text else ""
-            logger.debug(f"Processing text content: {text_content[:100]}...")
-            
-            systems_prompt = "Analyze these lab results and categorize them into the following body systems:\n"
-            for system, details in self.body_systems.items():
-                systems_prompt += f"- {system.title()}: {', '.join(details['tests'])}\n"
-            
-            payload = json.dumps({
-                "message": f"{systems_prompt}\nLab Results:\n{text_content}",
-                "conversation_id": None,
-                "tone": "BALANCED",
-                "markdown": False
-            })
-            
-            logger.debug("Sending request to API")
-            self.conn.request("POST", "/copilot", payload, self.headers)
-            response = self.conn.getresponse()
-            data = json.loads(response.read().decode("utf-8"))
-            logger.info("API response received successfully")
-            
-            categories = self.categorize_results(text_content)
-            logger.debug(f"Categorized results: {categories}")
-            
-            return {
-                'result': data.get('response', 'Analysis pending'),
-                'categories': categories
-            }
-        except Exception as e:
-            logger.error(f"Error in analyze_with_ai: {str(e)}")
-            logger.error(traceback.format_exc())
-            return {'result': 'Analysis failed', 'categories': {}}
-
-def extract_lab_values(self, text):
-    logger.info("Starting lab value extraction")
-    values = defaultdict(dict)
-    text_content = str(text) if text else ""
+        text_content = str(text) if text else ""
+        systems_prompt = "Analyze these lab results and categorize them into the following body systems:\n"
+        for system, details in self.body_systems.items():
+            systems_prompt += f"- {system.title()}: {', '.join(details['tests'])}\n"
     
-    for line in text_content.split('\n'):
-        for test_type, details in self.body_systems.items():
-            for test in details['tests']:
-                if test.lower() in line.lower():
-                    if measurement := re.search(self.patterns['measurement'], line):
-                        values[test] = {
-                            'value': measurement.group(1),
-                            'unit': measurement.group(2),
-                            'system': test_type
-                        }
-                        if flag_match := re.search(self.patterns['abnormal_flags'], line):
-                            values[test]['flag'] = flag_match.group(1)
-    return values
+        payload = json.dumps({
+            "message": f"{systems_prompt}\nLab Results:\n{text_content}",
+            "conversation_id": None,
+            "tone": "BALANCED",
+            "markdown": False
+        })
 
+        self.conn.request("POST", "/copilot", payload, self.headers)
+        response = self.conn.getresponse()
+        data = json.loads(response.read().decode("utf-8"))
+        logger.info("API response received successfully")
+        
+        categories = self.categorize_results(text_content)
+        
+        return {
+            'result': data.get('response', 'Analysis pending'),
+            'categories': categories
+        }
 
-def determine_status(self, value, reference_range):
-        logger.debug(f"Determining status for value: {value}, range: {reference_range}")
+    def extract_lab_values(self, text):
+        logger.info("Starting lab value extraction")
+        values = defaultdict(dict)
+        text_content = str(text) if text else ""
+        
+        for line in text_content.split('\n'):
+            for test_type, details in self.body_systems.items():
+                for test in details['tests']:
+                    if test.lower() in line.lower():
+                        if measurement := re.search(self.patterns['measurement'], line):
+                            values[test] = {
+                                'value': measurement.group(1),
+                                'unit': measurement.group(2),
+                                'system': test_type
+                            }
+                            if flag_match := re.search(self.patterns['abnormal_flags'], line):
+                                values[test]['flag'] = flag_match.group(1)
+        return values
+
+    def determine_status(self, value, reference_range):
         try:
             value = float(value)
             min_val = float(reference_range.get('min', 0))
@@ -132,52 +121,39 @@ def determine_status(self, value, reference_range):
             elif value > max_val:
                 return "high"
             return "normal"
-        except (ValueError, TypeError) as e:
-            logger.error(f"Error determining status: {str(e)}")
+        except (ValueError, TypeError):
             return "unknown"
 
-def categorize_results(self, text):
+    def categorize_results(self, text):
         logger.info("Starting result categorization")
-        try:
-            values = self.extract_lab_values(text)
-            categories = defaultdict(list)
-            
-            for test, data in values.items():
-                system = data.get('system')
-                if system:
-                    result = {
-                        'test': test,
-                        'value': data.get('value'),
-                        'unit': data.get('unit'),
-                        'status': 'abnormal' if data.get('flag') else 'normal'
-                    }
-                    categories[system].append(result)
-                    logger.debug(f"Categorized {test} under {system}")
-            
-            return dict(categories)
-        except Exception as e:
-            logger.error(f"Error in categorize_results: {str(e)}")
-            logger.error(traceback.format_exc())
-            return {}
-def generate_summary(self, categories):
-        logger.info("Generating summary")
-        try:
-            summary = {
-                'abnormal': [],
-                'optimal': [],
-                'normal': []
-            }
-            
-            for system, results in categories.items():
-                for result in results:
-                    if result['status'] == 'abnormal':
-                        summary['abnormal'].append(f"{result['test']} in {system}")
-                    elif result['status'] == 'normal':
-                        summary['normal'].append(f"{result['test']} in {system}")
-            
-            logger.debug(f"Generated summary: {summary}")
-            return summary
-        except Exception as e:
-            logger.error(f"Error generating summary: {str(e)}")
-            logger.error(traceback.format_exc())
-            return {'abnormal': [], 'optimal': [], 'normal': []}
+        values = self.extract_lab_values(text)
+        categories = defaultdict(list)
+        
+        for test, data in values.items():
+            system = data.get('system')
+            if system:
+                result = {
+                    'test': test,
+                    'value': data.get('value'),
+                    'unit': data.get('unit'),
+                    'status': 'abnormal' if data.get('flag') else 'normal'
+                }
+                categories[system].append(result)
+        
+        return dict(categories)
+
+    def generate_summary(self, categories):
+        summary = {
+            'abnormal': [],
+            'optimal': [],
+            'normal': []
+        }
+        
+        for system, results in categories.items():
+            for result in results:
+                if result['status'] == 'abnormal':
+                    summary['abnormal'].append(f"{result['test']} in {system}")
+                elif result['status'] == 'normal':
+                    summary['normal'].append(f"{result['test']} in {system}")
+        
+        return summary
