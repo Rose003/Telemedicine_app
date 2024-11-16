@@ -254,41 +254,24 @@ def labs(request):
     analyzer = LabReportAnalyzer()
     lab_reports = HealthLabreport.objects.all().order_by('-upload_date')
     
-    analyzed_data = {
-        'categories': defaultdict(list),
-        'summary': {
-            'abnormal': [],
-            'optimal': [],
-            'normal': []
-        }
-    }
+    analyzed_data = {}
     
     for report in lab_reports:
         file_path = os.path.join(settings.MEDIA_ROOT, str(report.file_path))
         text = extract_text_from_pdf(file_path)
         
-        values = analyzer.extract_lab_values(text)
-        categories = analyzer.categorize_results(values)
-        summary = analyzer.generate_summary(categories)
-        
-        analyzed_data[str(report.id)] = {
-            'categories': dict(categories),
-            'summary': dict(summary),
-            'report_info': {
-                'filename': report.filename,
-                'hospital': report.hospital,
-                'date': report.upload_date.isoformat(),
-                'file_path': str(report.file_path)
-            }
-        }
-        
+        # Use analyze_with_ai instead of extract_lab_values
+        analysis = analyzer.analyze_with_ai(text)
+        analyzed_data[str(report.id)] = analysis
+    
     context = {
         'lab_reports': lab_reports,
-        'analyzed_data': dict(analyzed_data),
-        'body_systems': list(analyzer.body_systems.keys())
+        'analyzed_data': analyzed_data
     }
     
     return render(request, 'health/labs.html', context)
+
+
 
 def upload_lab_report(request):
     if request.method == 'POST':
@@ -311,22 +294,19 @@ def upload_lab_report(request):
             
             analyzer = LabReportAnalyzer()
             text = extract_text_from_pdf(os.path.join(settings.MEDIA_ROOT, path))
-            values = analyzer.extract_lab_values(text)
-            categories = analyzer.categorize_results(values)
-            
-            report.analysis_results = json.dumps(categories)
-            report.save()
+            analysis = analyzer.analyze_with_ai(text)
             
             return JsonResponse({
                 'success': True,
+                'id': report.id,
                 'filename': report.filename,
                 'file_url': f'/media/{report.file_path}',
                 'hospital': report.hospital,
                 'date': report.upload_date.strftime('%Y-%m-%d'),
-                'analysis': categories
+                'analysis': analysis
             })
     
-    return JsonResponse({'success': False})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 @csrf_exempt
 @require_http_methods(["DELETE"])

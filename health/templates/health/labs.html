@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -312,6 +313,68 @@
 .share-option.whatsapp:hover { color: #25D366; }
 .share-option.copy:hover { color: #6c757d; }
 
+/*analysis styling*/
+.analysis-summary {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.system-category {
+    margin-bottom: 10px;
+}
+
+.system-category h4 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.result-item.abnormal { color: #dc3545; }
+.result-item.optimal { color: #28a745; }
+.result-item.normal { color: #17a2b8; }
+
+
+.body-system-item {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.body-system-item:hover,
+.body-system-item.active {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.analysis-results-container {
+    margin-top: 20px;
+}
+
+.analysis-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: none;
+}
+
+.result-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.result-item.abnormal { background-color: #fff5f5; }
+.result-item.optimal { background-color: #f0fff4; }
+
+.recommendations {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+
 
       @media (max-width: 768px) {
         .main-content {
@@ -441,11 +504,27 @@
       <div class="reports-container">
         {% if lab_reports %}
             {% for report in lab_reports %}
-            <div class="report-item" data-report-id="{{ report.id }}">
+            <div class="report-item" data-report-id="{{ report.id }}" data-analysis="{{ analyzed_data|get_item:report.id|to_json }}">
                 <div class="report-details">
                     <span class="report-title">{{ report.filename }}</span>
                     <span>Date Uploaded: {{ report.upload_date|date:"Y-m-d" }}</span>
                     <span>Hospital: {{ report.hospital }}</span>
+                </div>
+                <div class="analysis-summary">
+                    {% with analysis=analyzed_data|get_item:report.id %}
+                        {% for system, results in analysis.categories.items %}
+                            <div class="system-category" data-system="{{ system }}">
+                                <h4>{{ system|title }}</h4>
+                                <ul>
+                                    {% for result in results %}
+                                        <li class="{{ result.status }}">
+                                            {{ result.test }}: {{ result.value }} {{ result.unit }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    {% endwith %}
                 </div>
                 <div class="report-actions">
                     <a href="{{ report.file_path.url }}" target="_blank" class="view-btn">
@@ -482,105 +561,176 @@
             {% endfor %}
         {% endif %}
     </div>    
+    <!-- Add this right after your reports-container div -->
+    <div class="analysis-results-container">
+        {% if analyzed_data %}
+            {% for report_id, analysis in analyzed_data.items %}
+                {% for system, results in analysis.categories.items %}
+                    <div class="analysis-card" data-system="{{ system }}">
+                        <h3>{{ system|title }} Results</h3>
+                        <div class="results-list">
+                            {% for result in results %}
+                                <div class="result-item {{ result.status }}">
+                                    <div class="test-info">
+                                        <span class="test-name">{{ result.test|title }}</span>
+                                        <span class="test-value">{{ result.value }} {{ result.unit }}</span>
+                                    </div>
+                                    <div class="status-indicator {{ result.status }}"></div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <!-- Add this temporarily for debugging -->
+<div style="display: none;">
+    <pre>{{ analyzed_data|pprint }}</pre>
+</div>
+
+    
     </div>
 
-    <script>
-      document
-        .getElementById("uploadForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          const formData = new FormData();
-          const fileInput = document.getElementById("labReport");
-          const hospitalInput = document.getElementById("hospital");
-
-          formData.append("lab_report", fileInput.files[0]);
-          formData.append("hospital", hospitalInput.value);
-          formData.append(
-            "csrfmiddlewaretoken",
-            document.querySelector("[name=csrfmiddlewaretoken]").value
-          );
-
-          try {
-            const response = await fetch("/upload-lab-report/", {
-              method: "POST",
-              body: formData,
-            });
-
-            const data = await response.json();
-            if (data.success) {
-              const newReport = `
-    <div class="report-item" data-report-id="${data.id}">
-        <div class="report-details">
-            <span class="report-title">${data.filename}</span>
-            <span>Date Uploaded: ${data.date}</span>
-            <span>Hospital: ${data.hospital}</span>
-        </div>
-        <div class="report-actions">
-            <a href="${data.file_url}" target="_blank" class="view-btn">
-                <i class="material-icons">visibility</i>
-                View
-            </a>
-            <button class="delete-btn" onclick="confirmDelete(${data.id})">
-                <i class="material-icons">delete</i>
-                Delete
-            </button>
-            <div class="share-buttons">
-        <button class="share-btn gmail" onclick="shareViaGmail('{{ report.file_path.url }}')">
-            <i class="material-icons">mail</i>
-        </button>
-        <button class="share-btn whatsapp" onclick="shareViaWhatsApp('{{ report.file_path.url }}')">
-            <i class="material-icons">whatsapp</i>
-        </button>
-        <button class="share-btn copy" onclick="copyLink('{{ report.file_path.url }}')">
-            <i class="material-icons">content_copy</i>
-        </button>
-    </div>
-        </div>
-    </div>
-`;
-
-              const reportsContainer =
-                document.querySelector(".reports-container");
-              reportsContainer.insertAdjacentHTML("afterbegin", newReport);
-
-              document.getElementById("uploadForm").reset();
-              document.querySelector(".file-name").textContent = "";
-            }
-          } catch (error) {
-            console.error("Upload failed:", error);
-          }
-        });
-
-      document
-        .getElementById("labReport")
-        .addEventListener("change", function (e) {
-          const fileName = e.target.files[0]?.name || "No file selected";
-          document.querySelector(".file-name").textContent = fileName;
-        });
-    </script>
-    <!-- Add this in the head section -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Update the JavaScript -->
     <script>
-      function confirmDelete(reportId) {
-        Swal.fire({
-          title: "Delete Lab Report",
-          text: "Are you sure you want to delete this lab report?",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#dc3545",
-          cancelButtonColor: "#6c757d",
-          confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            deleteReport(reportId);
-          }
-        });
-      }
+   document.addEventListener('DOMContentLoaded', function() {
+    // File upload handling
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('labReport');
+    const hospitalInput = document.getElementById('hospital');
 
-      async function deleteReport(reportId) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('lab_report', fileInput.files[0]);
+        formData.append('hospital', hospitalInput.value);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        try {
+            const response = await fetch('/upload-lab-report/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            if(data.success) {
+                const newReport = `
+                    <div class="report-item" data-report-id="${data.id}">
+                        <div class="report-details">
+                            <span class="report-title">${data.filename}</span>
+                            <span>Date Uploaded: ${data.date}</span>
+                            <span>Hospital: ${data.hospital}</span>
+                        </div>
+                        <div class="report-actions">
+                            <a href="${data.file_url}" target="_blank" class="view-btn">
+                                <i class="material-icons">visibility</i>
+                                View
+                            </a>
+                            <div class="share-dropdown">
+                                <button class="share-btn">
+                                    <i class="material-icons">share</i>
+                                </button>
+                                <div class="share-menu">
+                                    <button onclick="shareViaGmail('${data.file_url}')" class="share-option gmail">
+                                        <i class="material-icons">mail</i>
+                                        Gmail
+                                    </button>
+                                    <button onclick="shareViaWhatsApp('${data.file_url}')" class="share-option whatsapp">
+                                        <i class="fab fa-whatsapp"></i>
+                                        WhatsApp
+                                    </button>
+                                    <button onclick="copyLink('${data.file_url}')" class="share-option copy">
+                                        <i class="material-icons">content_copy</i>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="delete-btn" onclick="confirmDelete(${data.id})">
+                                <i class="material-icons">delete</i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                const reportsContainer = document.querySelector('.reports-container');
+                reportsContainer.insertAdjacentHTML('afterbegin', newReport);
+                
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Report uploaded successfully',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                uploadForm.reset();
+                document.querySelector('.file-name').textContent = '';
+            }
+        } catch (error) {
+            console.log('Upload response:', error);
+            Swal.fire({
+                title: 'Upload Failed',
+                text: 'Please try again',
+                icon: 'error',
+                timer: 2000
+            });
+        }
+    });
+
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || 'No file selected';
+        document.querySelector('.file-name').textContent = fileName;
+    });
+
+    // Body system navigation
+    const bodySystemItems = document.querySelectorAll('.body-system-item');
+    bodySystemItems.forEach(item => {
+        item.addEventListener('click', function() {
+            bodySystemItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            const selectedSystem = this.dataset.icon;
+            document.querySelectorAll('.analysis-card').forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            document.querySelectorAll(`.analysis-card[data-system="${selectedSystem}"]`).forEach(card => {
+                card.style.display = 'block';
+            });
+        });
+    });
+});
+
+// Report deletion handling
+function confirmDelete(reportId) {
+    Swal.fire({
+        title: 'Delete Lab Report',
+        text: 'Are you sure you want to delete this lab report?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteReport(reportId);
+        }
+    });
+}
+
+async function deleteReport(reportId) {
     try {
         const response = await fetch(`/delete-report/${reportId}/`, {
             method: 'DELETE',
@@ -604,11 +754,17 @@
             });
         }
     } catch (error) {
-        console.log('Operation completed, but with response error');
+        console.log('Delete operation failed:', error);
+        Swal.fire({
+            title: 'Delete Failed',
+            text: 'Please try again',
+            icon: 'error',
+            timer: 2000
+        });
     }
 }
-    </script>
-<script>
+
+// Sharing functionality
 function shareViaGmail(url) {
     const subject = 'Lab Report';
     const body = `Check out my lab report: ${url}`;
@@ -631,8 +787,7 @@ function copyLink(url) {
         });
     });
 }
-</script>
-
-  </body>
+    </script>
+    
   </body>
 </html>
