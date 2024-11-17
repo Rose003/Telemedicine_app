@@ -13,3 +13,9 @@ def get_item(dictionary, key):
 @register.filter
 def to_json(value):
     return json.dumps(value)
+
+@register.filter
+def get_interpretation(value):
+    if isinstance(value, str):
+        value = json.loads(value)
+    return value.get('interpretations', '')
