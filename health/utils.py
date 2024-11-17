@@ -63,27 +63,59 @@ class LabReportAnalyzer:
 
 
         self.patterns = {
-    'test_line': r'^([\w\s\(\)\/]+?)\s+([\d\.]+)\s*([HL\*]*)\s*([\w\/\%]+)\s*([\d\.-]+(?:\s*-\s*[\d\.]+)?)',
-    'measurement': r'(\d+\.?\d*)\s*(mg/dL|g/dL|U/L|%|mmol/L|µmol/L|ng/mL|pg/mL|mIU/L|µIU/mL|g/L|mmHg|fL|K/µL|M/mcL)',
-    'range': r'(\d+\.?\d*)\s*-\s*(\d+\.?\d*)',
-    'flags': r'([HL]\*{0,2})',
-    'critical': r'\*\*',
-    'patient_info': r'Name:\s*(.*?)\s*Age\/Sex:\s*(\d+)\/([MF])',
-    'collection_date': r'Collection Date\/Time:\s*(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2})',
-    'report_section': r'(COMPLETE BLOOD COUNT|DIFFERENTIAL|CHEMISTRY|LIPID PANEL)(.*?)(?=(COMPLETE BLOOD COUNT|DIFFERENTIAL|CHEMISTRY|LIPID PANEL|\Z))',
-    'test_pattern': r'([\w\s\(\)\-\.]+?):\s*([\d\.]+)\s*([A-Za-z\/\s]+)',
-    'test_name': r'^([A-Za-z\s&\-]+):\s*(\d+\.?\d*)',
-    'abnormal_flags': r'(H|L|HIGH|LOW|CRITICAL|ABNORMAL)',
-    'units_extended': r'(ng/dL|pmol/L|mcg/dL|mEq/L|10\^3/µL|10\^6/µL)',
-    'percentages': r'(\d+\.?\d*)\s*%',
-    'ratios': r'(\d+\.?\d*)\s*:\s*(\d+\.?\d*)',
-    'blood_pressure': r'(\d{2,3})/(\d{2,3})\s*mmHg',
-    'doctor_name': r'(Dr\.|Doctor)\s+([A-Za-z\s\.]+)',
-    'diagnosis': r'(Diagnosis|Clinical Indication):\s*(.+)',
-    'specimen': r'(Specimen|Sample Type):\s*([A-Za-z\s]+)',
-    'patient_id': r'(Patient ID|MRN):\s*([A-Z0-9-]+)'
+   # Matches test names with various formats, including parentheses, slashes, and special characters
+    'test_line': r'([\w\s\-\/\(\)\,\+\%\d]+?)\s+([\d\.]+)\s*([\w\/µ\%\^\d]+\/?\w*)\s*([\d\.]+\s*-\s*[\d\.]+|[\d\.]+\s*(?:and|to)\s*[\d\.]+)?\s*([NHL\*]+)?',
+    
+    # Captures all possible measurement units across different lab standards
+    'measurement': r'(\d+\.?\d*)\s*(mmol/L|µmol/L|g/L|U/L|mg/dL|g/dL|%|ng/mL|pg/mL|mIU/L|µIU/mL|mmHg|fL|K/µL|10\^3/µL|10\^6/µL|mEq/L|IU/L|µg/L|ng/L|pmol/L|kU/L)',
+    
+    # Matches various range formats including decimal points and different separators
+    'range': r'([\d\.]+)\s*(?:-|to|and|\~)\s*([\d\.]+)',
+    
+    # Captures all possible flag indicators including combinations
+    'flags': r'([NHL\*\+\-\!\?]+)',
+    
+    # Identifies critical values with various markings
+    'critical': r'(\*\*|\!\!|\+\+|!!|CRIT|CRITICAL)',
+    
+    # Comprehensive patient information pattern
+    'patient_info': r'(?:Patient|Name|ID):\s*(.*?)\s*(?:Age|DOB)[\s\/]*(?:Sex)?:\s*(\d+)?\s*[\/-]?\s*([MFmf])',
+    
+    # Multiple date formats from different regions
+    'collection_date': r'(?:Collection|Draw|Sample|Test)\s*(?:Date|Time):\s*(\d{1,2}[-\/\.]\d{1,2}[-\/\.]\d{2,4})?(?:\s+(\d{1,2}:\d{2}(?:\s*[AaPp][Mm])?)?)',
+     # Expanded section headers for different report types
+    'section_header': r'^(?:REPORT\s+FOR|TEST\s+RESULTS?|LABORATORY\s+RESULTS?|ANALYSIS\s+RESULTS?)?\s*(Complete Blood Count|CBC|Liver Function Test|LFT|Lipid Profile|Kidney Function|Thyroid Profile|Metabolic Panel|Chemistry Panel|Hematology|Serology|Urinalysis|Immunology|Hormone Analysis|Tumor Markers|Cardiac Markers|Diabetes Panel)',
+    
+    # Various ratio calculations
+    'ratio': r'([\w\s\/\-\+]+(?:Ratio|Index|Score))\s*[:\=]?\s*([\d\.]+)',
+    
+    # Extended unit patterns including international variations
+    'unit_extended': r'(nmol/L|pmol/L|mIU/mL|ng/dL|µg/dL|mEq/L|kIU/L|µIU/mL|g/mmol|mmol/mol|µkat/L|mkat/L)',
+    
+    # International date formats
+    'date_formats': r'(\d{1,2}[-\/\.]\d{1,2}[-\/\.]\d{2,4})|(\d{4}[-\/\.]\d{1,2}[-\/\.]\d{1,2})',
+    
+    # 12/24 hour time formats
+    'time_format': r'(\d{1,2}:\d{2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)',
+    
+    # Comprehensive report sections with subsections
+    'report_section': r'(?:^|\n)((?:COMPLETE\s+)?(?:BLOOD\s+COUNT|CBC|DIFFERENTIAL|CHEMISTRY|METABOLIC\s+PANEL|LIPID\s+PANEL|LIVER\s+PANEL|KIDNEY\s+PANEL|THYROID\s+PANEL|CARDIAC\s+PANEL|DIABETES\s+PANEL)(?:\s+RESULTS?)?)(.*?)(?=\n(?:(?:COMPLETE\s+)?(?:BLOOD\s+COUNT|CBC|DIFFERENTIAL|CHEMISTRY|METABOLIC\s+PANEL|LIPID\s+PANEL|LIVER\s+PANEL|KIDNEY\s+PANEL|THYROID\s+PANEL|CARDIAC\s+PANEL|DIABETES\s+PANEL)(?:\s+RESULTS?)?)|$)',
+    
+    # Detailed test name pattern
+    'test_name': r'^([\w\s\-\/\(\)\,\+\%\d]+?)(?=\s+[\d\.]+)',
+    
+    # Scientific notation and decimal values
+    'numeric_value': r'\b(\d+\.?\d*(?:[Ee][\+\-]?\d+)?)\b',
+    
+    # Reference intervals with various formats
+    'reference_interval': r'(?:Reference\s+(?:Range|Interval|Values?)|Normal\s+Range|Expected\s+Values?)?\s*(?:<|>|≤|≥)?\s*([\d\.]+)\s*(?:-|to|and)\s*([\d\.]+)',
+    
+    # Comprehensive abnormal flags
+    'abnormal_flags': r'\b([HLhl\*\+\!\?]+)\b',
+    
+    # All possible unit combinations
+    'units_all': r'\b(g/L|mg/dL|µmol/L|mmol/L|U/L|%|ng/mL|pg/mL|fL|10\^9/L|10\^12/L|mEq/L|IU/L|µg/L|ng/L|pmol/L|kU/L|µkat/L|mkat/L|g/mmol|mmol/mol)\b'
 }
-
 
     def analyze_with_ai(self, text):
         logger.info("Starting AI analysis")
@@ -92,13 +124,13 @@ class LabReportAnalyzer:
         extracted_values = self.extract_lab_values(text_content)
         logger.info(f"Extracted values: {extracted_values}")
 
-        prompt = f"""Provide a clear medical analysis for these lab results:
-        1. Key findings
-        2. Main abnormalities and their significance
-        3. Brief interpretation for each abnormal value
-        4. Overall health implications
+        prompt = f"""Analyze these lab results in simple, patient-friendly language:
+        1. What's Normal: List all tests that are within healthy ranges
+        2. Areas of Concern: Highlight any abnormal values and what they mean for health
+        3. Action Steps: Suggest lifestyle changes or follow-up actions
+        4. Simple Summary: Brief overview in everyday language
         
-        Values: {extracted_values}"""
+        Lab Values: {extracted_values}"""
 
         payload = json.dumps({
             "message": prompt,
@@ -107,14 +139,12 @@ class LabReportAnalyzer:
             "markdown": False
         })
 
-        logger.info(f"Sending summarized prompt: {prompt}")
+        logger.info(f"Sending patient-focused prompt: {prompt}")
         self.conn.request("POST", "/copilot", payload, self.headers)
         response = self.conn.getresponse()
         ai_analysis = json.loads(response.read().decode("utf-8"))
-
-         # Extract the message from the nested AI response
-        interpretation = ai_analysis.get('data', {}).get('message', '')
         
+        interpretation = ai_analysis.get('data', {}).get('message', '')
         logger.info(f"AI Response: {ai_analysis}")
 
         return {
@@ -122,6 +152,7 @@ class LabReportAnalyzer:
             'categories': self.categorize_results(extracted_values),
             'interpretations': interpretation
         }
+
 
 
 
