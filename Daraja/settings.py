@@ -156,3 +156,8 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'health', 'media')
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'patient_dashboard'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]

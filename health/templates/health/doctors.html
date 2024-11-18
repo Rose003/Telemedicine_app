@@ -406,12 +406,8 @@
         </div>
         <form id="appointmentForm" class="booking-form">
             {% csrf_token %}
-            <input type="hidden" id="doctorId" name="doctor_id">            
-            <div class="form-group">
-                <label for="patientId">Patient ID</label>
-                <input type="text" id="patientId" name="patient_id" required placeholder="Enter your Patient ID">
-            </div>
-        
+            <input type="hidden" id="doctorId" name="doctor_id">  
+            <input type="hidden" id="patientId" name="patient_id" value="{{ request.session.user_id }}">                  
             <div class="form-group">
                 <label for="appointmentDate">Appointment Date</label>
                 <input type="date" id="appointmentDate" name="appointment_date" required>

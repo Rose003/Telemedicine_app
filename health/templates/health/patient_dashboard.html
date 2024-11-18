@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{% static 'health/css/dashboard.css' %}" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </head>
+
   <body>
     <!-- Sidebar -->
     <button class="menu-toggle" onclick="toggleSidebar()">
@@ -72,7 +73,9 @@
  <!-- Update the greeting section with controlled expansion -->
 <div class="user-greeting">
   <div class="greeting-content">
-      <h2 data-translate>Hello, Rose</h2>
+    <!--<p>Debug: {{ request.user }}</p>-->
+
+    <h2 data-translate>Hello, {{ request.session.first_name }}</h2>
       <div class="mood-selector" id="moodSelector">
           How are you feeling today?
           <div class="mood-emojis">
@@ -360,73 +363,77 @@
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 24px; margin-top: 24px;">
-        <!-- Recent Doctors Container -->
-        <div class="doctor-container" style="flex: 1;">
-            <h2>Recent Doctors</h2>
-            <div class="doctor">
-                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Bessie Cooper" />
-                <div class="doctor-info">
-                    <h3>Dr. Bessie Cooper</h3>
-                    <p>Cardiologist</p>
-                    <div class="rating">
-                        <span>⭐⭐⭐⭐⭐</span> <span>4.8 (5.6K Reviews)</span>
-                    </div>
-                </div>
+      <!-- Appointments and Calendar Section -->
+  <div style="display: flex; gap: 24px; margin-top: 24px;">
+    <!-- Appointments Section -->
+    <div style="background: white; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); flex: 2;">
+      <h2 style="color: #2C5494; font-size: 24px; margin-bottom: 24px; font-weight: 600;">Upcoming Appointments</h2>
+      {% if upcoming_appointments %}
+        {% for appointment in upcoming_appointments %}
+          <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 16px; transition: transform 0.2s ease; border: 1px solid #e9ecef;">
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <img src="{% static 'health/images/doctor1.png' %}" alt="{{ appointment.doctor.first_name }}" 
+                   style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #2C5494;"/>
+              <div style="margin-left: 16px;">
+                <h3 style="margin: 0; color: #0C2340; font-size: 18px; font-weight: 600;">Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h3>
+                <span style="color: #2C5494; font-size: 14px; display: inline-block; margin-top: 4px;">{{ appointment.doctor.specialization }}</span>
+              </div>
             </div>
-            <div class="doctor">
-                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Savannah Nguyen" />
-                <div class="doctor-info">
-                    <h3>Dr. Savannah Nguyen</h3>
-                    <p>Optometry</p>
-                    <div class="rating">
-                        <span>⭐⭐⭐⭐⭐</span> <span>5.0 (5.2K Reviews)</span>
-                    </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #e9ecef;">
+              <div style="display: flex; gap: 24px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
+                  <i class="fas fa-calendar"></i>
+                  {{ appointment.appointment_date|date:"D, M d, Y" }}
                 </div>
-            </div>
-            <div class="doctor">
-                <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Theresa Webb">
-                <div class="doctor-info">
-                    <h3>Dr. Theresa Webb</h3>
-                    <p>Dentist</p>
-                    <div class="rating">
-                        <span>⭐⭐⭐⭐⭐</span> <span>4.9 (5.1K Reviews)</span>
-                    </div>
+                <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
+                  <i class="fas fa-clock"></i>
+                  {{ appointment.appointment_time|time:"g:i A" }}
                 </div>
+              </div>
+              <div style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; text-transform: capitalize; background: #fff3cd; color: #856404;">
+                {{ appointment.status|title }}
+              </div>
             </div>
-            <a href="#" class="explore-more">Explore More</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 40px 0; color: #6c757d;">
+          <i class="fas fa-calendar-plus" style="font-size: 48px; margin-bottom: 16px;"></i>
+          <p>No upcoming appointments</p>
         </div>
-    
-       <!-- Calendar Container -->
-<div class="calendar-container">
-  <div class="calendar-header">
-      <h2 id="monthYear"></h2>
-      <div class="calendar-actions">
-          <button class="calendar-nav-btn" id="prevMonth">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-          </button>
-          <button class="calendar-nav-btn" id="nextMonth">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-          </button>
-      </div>
-  </div>
-
-  <div class="calendar" id="calendar"></div>
-
-  <button class="add-appointment-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Add New Appointment
-  </button>
-</div>
-
+      {% endif %}
+      <a href="{% url 'doctors' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #2C5494; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; margin-top: 20px;">
+        <i class="fas fa-plus"></i>
+        Book New Appointment
+      </a>
     </div>
 
+    <!-- Calendar Section -->
+    <!-- Calendar Section -->
+<div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); flex: 1;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 id="monthYear" style="font-size: 1.5rem; color: #0C2340; margin: 0;">Appointment Calendar</h2>
+    <div style="display: flex; gap: 10px;">
+      <button id="prevMonth" style="background: #0C2340; border: none; border-radius: 8px; padding: 8px; cursor: pointer; transition: all 0.3s ease; color: white;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="nextMonth" style="background: #0C2340; border: none; border-radius: 8px; padding: 8px; cursor: pointer; transition: all 0.3s ease; color: white;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="calendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">
+    {% for day in "SMTWTFS"|make_list %}
+    <div style="text-align: center; font-weight: bold; color: #2C5494; padding: 8px;">{{ day }}</div>
+    {% endfor %}
+  </div>
+</div>
+</div>
     <!-- Add this after the progress tracker -->
 <div class="ai-insights">
     <div class="insights-header">
@@ -495,7 +502,7 @@
 </div>
 
 
-<!-- Add this script to control mood selection -->
+<!-- script to control mood selection -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const moodSelector = document.getElementById('moodSelector');
@@ -527,9 +534,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
-
-
 
 <script>
    // Remove any form submit event listeners and keep only these essential functions
@@ -697,14 +701,50 @@ document.addEventListener('DOMContentLoaded', fetchHealthInsights);
       }
   
       createDayElement(day = '', date = null) {
-          const element = document.createElement('div');
-          element.classList.add('day');
-          element.textContent = day;
-          if (date) {
-              element.setAttribute('data-date', date.toDateString());
-          }
-          return element;
-      }
+    const element = document.createElement('div');
+    element.classList.add('day');
+    
+    if (day !== '') {
+        element.style.cssText = `
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 2px;
+        `;
+
+        if (this.appointments.has(date.toDateString())) {
+            element.style.backgroundColor = '#2C5494';
+            element.style.color = 'white';
+            element.style.fontWeight = 'bold';
+            element.style.boxShadow = '0 2px 4px rgba(44, 84, 148, 0.2)';
+        } else {
+            element.style.backgroundColor = 'transparent';
+            element.style.color = '#333';
+            
+            // Hover effect for non-appointment days
+            element.addEventListener('mouseover', () => {
+                element.style.backgroundColor = '#E8EBF0';
+            });
+            
+            element.addEventListener('mouseout', () => {
+                element.style.backgroundColor = 'transparent';
+            });
+        }
+    }
+
+    element.textContent = day;
+    if (date) {
+        element.setAttribute('data-date', date.toDateString());
+    }
+    return element;
+}
+
   
       addDayClickListener(element, date) {
           element.addEventListener('click', () => {
@@ -768,12 +808,24 @@ document.addEventListener('DOMContentLoaded', fetchHealthInsights);
   
   // Initialize calendar
   document.addEventListener('DOMContentLoaded', () => {
-      const calendar = new Calendar();
-      calendar.init();
-  });
-</script>  
+    const calendar = new Calendar();
+    
+    // Add sample appointments (replace with your actual appointments data)
+    const appointments = [
+        { date: new Date(), details: 'Doctor appointment' },
+        { date: new Date(new Date().setDate(new Date().getDate() + 5)), details: 'Follow-up' }
+    ];
+    
+    appointments.forEach(apt => {
+        calendar.addAppointment(apt.date, apt.details);
+    });
+    
+    calendar.init();
+});
+</script>
+
         <!-- Updated JavaScript for Gauge Animation -->
-        <script>
+ <script>
         document.addEventListener('DOMContentLoaded', function() {
             const arrow = document.getElementById('bmiArrow');
             const bmi = parseFloat(arrow.dataset.bmi) || 20;

@@ -76,6 +76,8 @@ def login_view(request):
             if check_password(password, patient.password_hash):
                 request.session['user_type'] = 'PATIENT'
                 request.session['user_id'] = patient.patient_id
+                request.session['first_name'] = patient.first_name  # Add this line here
+
                 return redirect('patient_dashboard')
         except Patients.DoesNotExist:
             pass
@@ -137,12 +139,23 @@ def doctor_dashboard(request):
 
 @login_required('PATIENT')
 def patient_dashboard(request):
+   
     # Get all reports ordered by newest first
     lab_reports = HealthLabreport.objects.all().order_by('-upload_date')
     print("Fetched reports:", lab_reports)  # Add this line for debugging
+
+    # Get upcoming appointments for the logged-in patient
+    upcoming_appointments = Appointments.objects.filter(
+        patient_id=request.session.get('user_id'),
+        appointment_date__gte=timezone.now(),
+        status='pending'
+    ).select_related('doctor').order_by('appointment_date')[:3]  # Limit to 3 most recent
     
     context = {
         'lab_reports': lab_reports,
+        'first_name': request.session.get('first_name'),  # Add this line
+        'upcoming_appointments': upcoming_appointments
+
     }
     return render(request, 'health/patient_dashboard.html', context)
 

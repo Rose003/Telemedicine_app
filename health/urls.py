@@ -18,7 +18,7 @@ urlpatterns = [
     path('upload-lab-report/', views.upload_lab_report, name='upload_lab_report'),
     path('delete-report/<int:report_id>/', views.delete_report, name='delete_report'),
     path('labs/', views.labs, name='labs'), 
-    path('patient-signup/', views.patient_signup, name='signup'),
+    path('signup/', views.patient_signup, name='signup'),
     path('login/', views.login_view, name='login'),
     path('api/book-appointment/', views.book_appointment, name='book_appointment'),
 
