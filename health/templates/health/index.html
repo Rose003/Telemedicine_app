@@ -1,205 +1,666 @@
-{% extends 'health/base.html' %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Healthcare Landing Page</title>
+    <style>
+      :root {
+    --primary-dark: #0C2340;
+    --primary-light: #1B3B66;
+    --primary-accent: #2C5494;
+}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #e6eef3, #ffffff);
+            color: #002c56;
+            overflow-x: hidden;
+        }
 
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'health/css/styles.css' %}">
-{% endblock %}
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .logo img {
+    height: 40px;
+    width: auto;
+    filter: brightness(0.9);
+}
 
 
-{% block content %}     
-     <!-- Video section -->
-     <div class="video-container">
-        <video controls autoplay muted playsinline>
-            <source src="{% static 'health/videos/afyavideo2.mp4' %}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #002c56;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #004a93;
+        }
+
+        .container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+            height: 100vh;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .text-section {
+            z-index: 2;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .text-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .text-section h4 {
+            font-size: 18px;
+            color: #89b0d3;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .text-section h1 {
+            font-size: 50px;
+            font-weight: bold;
+            color: #002c56;
+            margin-bottom: 20px;
+        }
+
+        .text-section ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        .text-section ul li {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .about-btn {
+            background-color: #004a93;
+            color: white;
+        }
+
+        .contact-btn {
+            background-color: white;
+            border: 2px solid #004a93;
+            color: #004a93;
+        }
+
+        .image-section {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60%;
+            height: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .image-section img {
+            width: auto;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(2px) brightness(0.95);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .image-section img.loaded {
+            opacity: 0.9;
+        }
+
+        .curve {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            background: #ffffff;
+            border-radius: 100% 100% 0 0;
+            z-index: 3;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 50px;
+            background: linear-gradient(to bottom, #e6eef3, #ffffff);
+            text-align: center;
+        }
+
+        .features h2 {
+            color: #002c56;
+            font-size: 36px;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card img {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            color: #004a93;
+            margin-bottom: 15px;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 80px 50px;
+            background: #ffffff;
+        }
+
+        .benefits h2 {
+            color: #002c56;
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .benefit {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(to bottom, #e6eef3, #ffffff);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .benefit h3 {
+            color: #004a93;
+            margin-bottom: 15px;
+        }
+        .hero-description {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: #002c56;
+}
+
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 80px 50px;
+            background: linear-gradient(to bottom, #ffffff, #e6eef3);
+            text-align: center;
+        }
+
+        .testimonials h2 {
+            color: #002c56;
+            font-size: 36px;
+            margin-bottom: 40px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-card p {
+            font-size: 18px;
+            color: #002c56;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .testimonial-card h4 {
+            color: #004a93;
+            font-weight: 500;
+        }
+
+        /* Pricing CTA Section */
+        .pricing-cta {
+            padding: 80px 50px;
+            text-align: center;
+            background: linear-gradient(to bottom, #e6eef3, #ffffff);
+        }
+
+        .pricing-cta h2 {
+            color: #002c56;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-cta p {
+            color: #004a93;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .image-section {
+                position: relative;
+                width: 100%;
+                height: 50vh;
+                margin-top: 2rem;
+            }
+
+            .text-section {
+                max-width: 100%;
+            }
+
+            .features,
+            .benefits,
+            .testimonials,
+            .pricing-cta {
+                padding: 40px 20px;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card,
+            .benefit,
+            .testimonial-card {
+                padding: 20px;
+            }
+        }
+footer {
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 4rem 0;
+}
+
+.footer {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.f-logo {
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: #ffd700;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-icon {
+    color: white;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.social-icon:hover {
+    color: #ffd700;
+}
+.analytics {
+    padding: 60px 0;
+    background: linear-gradient(to right, #e6eef3, #ffffff);
+    text-align: center;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 30px;
+}
+
+.counter-box {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.counter {
+    font-size: 48px;
+    font-weight: bold;
+    color: #004a93;
+}
+
+.counter-box h3 {
+    color: #002c56;
+    margin-top: 10px;
+    font-size: 20px;
+}
+.icon-counter {
+    font-size: 32px;
+    color: #004a93;
+    opacity: 0.8;
+}
+
+
+        
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="{% static 'health/images/logo1.png' %}" alt="SHIF+" class="logo">
     </div>
-
-    <!-- Generate buttons for letters A-Z -->
-
-<!-- Two-column section -->
-<div class="container-fluid">
-    <div class="row">
-        <!-- Left column with letter buttons -->
-        <div class="col-md-6">
-    <div class="letter-buttons">
-        <h2 style="display: block; width: 100%; text-align: center;">Find diseases & conditions by first letter</h2>
-        <script>
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            letters.split('').forEach(letter => {
-                document.write(`
-                <button class="letter-button">${letter}</button>`);
-            });
-        </script>
-    </div>
-</div>
-        <!-- Right column with search -->
-        <div class="col-md-6">
-            <div class="search-section">
-                <div class="search-container">
-                    <input type="text" class="form-control search-input" placeholder="Search conditions...">
-                    <button class="btn btn-primary search-btn">Search</button>
-                </div>
-            </div>
+          <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#benefits">Benefits</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#contact">Contact</a>
         </div>
-    </div>
-</div>
+    </nav>
 
-<div class="disease-list">
-    <!-- The disease/condition list will be dynamically generated here -->
-</div>
-</div>
-
-<!--Section for insurances-->
-<div class="container-fluid bg-white mt-5">
-    <h2 class="text-center mt-2 mb-4">Our Insurance Partners</h2>
-    <div id="insuranceCarousel" class="carousel slide" data-bs-ride="carousel">
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#insuranceCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#insuranceCarousel" data-bs-slide-to="1"></button>
-      </div>
-      <div class="carousel-inner">
-        <div class="carousel-item active">
-          <div class="row">
-            <div class="col-2"><img src="{% static 'health/images/old-mutual-logo.png' %}" class="d-block w-100" alt="Old Mutual"></div>
-            <div class="col-2"><img src="{% static 'health/images/jubilee-insurance-logo.png' %}" class="d-block w-100" alt="Jubilee Insurance"></div>
-            <div class="col-2"><img src="{% static 'health/images/aar-insurance-logo.png' %}" class="d-block w-100" alt="AAR Insurance"></div>
-            <div class="col-2"><img src="{% static 'health/images/heritage-insurance-logo.png' %}" class="d-block w-100" alt="Heritage Insurance"></div>
-            <div class="col-2"><img src="{% static 'health/images/madison-insurance-logo.png' %}" class="d-block w-100" alt="Madison Insurance"></div>
-            <div class="col-2"><img src="{% static 'health/images/apa-insurance-logo.png' %}" class="d-block w-100" alt="APA Insurance"></div>
-          </div>
-        </div>
-        <div class="carousel-item">
-          <div class="row">
-            <div class="col-2"><img src="{% static 'health/images/kenyan-alliance-insuarance-logo.png' %}" class="d-block w-100" alt="Kenyan Alliance"></div>
-            <div class="col-2"><img src="{% static 'health/images/ga-insurance-logo.png' %}" class="d-block w-100" alt="GA Insurance"></div>
-            <div class="col-2"><img src="{% static 'health/images/mua-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
-            <div class="col-2"><img src="{% static 'health/images/SHIF-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
-            <div class="col-2"><img src="{% static 'health/images/minet-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
-            <div class="col-2"><img src="{% static 'health/images/jubilee-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
-          </div>
-        </div>
-      </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#insuranceCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#insuranceCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
-    </div>
-</div>
-
-  
-
-
-<!--Cards for homepage-->
-<div class="container">
-    <div class="card">
-      <div class="icon">
-        <img src="{% static 'health/images/doctor1.png' %}" alt="" srcset="">
-      </div>
-      <h2>SHIF+</h2>
-      <p>Enroll in a membership and unlock priority access, Rx discounts, + more.</p>
-      <a href="#" class="button">LEARN MORE</a>
-    </div>
-    <div class="card">
-      <div class="icon">
-        <img src="{% static 'health/images/patient1.png' %}" alt="Patient Portal">
-      </div>
-      <h2>Patient Portal</h2>
-      <p>Gain access to test results securely and confidentially.</p>
-      <a href="{% url 'patient_portal' %}" class="button">VIEW PATIENT PORTAL</a>
-    </div>
-    <div class="card">
-      <div class="icon">
-        <img src="{% static 'health/images/monkeypox.png' %}" alt="monkeypox">
-      </div>
-      <h2>MonkeyPox Testing</h2>
-      <p>Everything from testing to treatment, we got you covered.</p>
-      <a href="#" class="button">LEARN MORE</a>
-    </div>
-  </div>      
-
-
-<!--Articles section-->
-<div class="container-fluid bg-light mt-3 py-2">
-    <div class="latest-articles">
-      <h1 class="text-center mb-4">Our Latest Articles</h1>
-      <div class="article-list">
-        <div class="article">
-          <div class="article-image">
-            <img src="{% static 'health/images/polio.png' %}" alt="polio">
-          </div>
-          <div class="article-content">
-            <span class="date">November 6, 2024</span>
-            <span class="category">Polio Vaccination</span>
-            <h2>Join the Fight Against Polio: Together, We Can Eradicate Polio for Good!
-            </h2>
-            <p>Polio is a highly contagious disease that affects children under the age of five, leading to irreversible paralysis and, in some cases, even death. But the good news is that polio is preventable through vaccination! Through collaborative global efforts, we've made incredible strides toward eliminating polio, yet the journey is not over....</p>
-            <a href="#" class="read-more">Read More</a>
-          </div>
-        </div>
-        <div class="article">
-            <div class="article-image">
-              <img src="{% static 'health/images/VCT.png' %}" alt="polio">
-            </div>
-            <div class="article-content">
-              <span class="date">November 9, 2024</span>
-              <span class="category">VCT Services</span>
-              <h2>Voluntary Counseling and Testing (VCT): Take Charge of Your Health</h2>
-              <p>Voluntary Counseling and Testing (VCT) is a critical service that empowers individuals to know their HIV status in a safe, confidential, and supportive environment. Whether you’re seeking clarity, peace of mind, or proactive steps to protect your health, VCT provides the knowledge and tools to help you make informed decisions....</p>
-              <a href="#" class="read-more">Read More</a>
-            </div>
-          </div>
-          <div class="article">
-            <div class="article-image">
-              <img src="{% static 'health/images/cancer.png' %}" alt="polio">
-            </div>
-            <div class="article-content">
-              <span class="date">October 9, 2024</span>
-              <span class="category">Cancer Awareness</span>
-              <h2>Breast Cancer Awareness Month: Early Detection Saves Lives
-            </h2>
-              <p>October is Breast Cancer Awareness Month, a time dedicated to spreading knowledge, fostering understanding, and inspiring action against one of the most common cancers worldwide. Every year, millions come together to support those affected by breast cancer and to empower others with lifesaving information....</p>
-              <a href="#" class="read-more">Read More</a>
-            </div>
-          </div>
-          <div class="article">
-            <div class="article-image">
-              <img src="{% static 'health/images/maternity.png' %}" alt="polio">
-            </div>
-            <div class="article-content">
-              <span class="date">September 30, 2024</span>
-              <span class="category">Maternity Care</span>
-              <h2>Linda Mama: Affordable Maternity Care for Every Mother in Kenya
-            </h2>
-              <p>Linda Mama is a government-led initiative that ensures pregnant women across Kenya have access to free, quality maternal and newborn care. This essential program, run by the National Hospital Insurance Fund (NHIF), aims to reduce maternal and infant mortality by providing financial support and healthcare resources to expectant mothers, regardless of their socio-economic background....</p>
-              <a href="#" class="read-more">Read More</a>
-            </div>
+    <div class="container" id="home">
+      <div class="text-section">
+          <h4>Transform Your Healthcare Management</h4>
+          <h1>Streamline Hospital Operations with ANHIS+</h1>
+          <p class="hero-description">Whether you're managing a single facility or multiple hospital branches, ANHIS+ adapts to your needs. Our comprehensive system delivers end-to-end solutions for every aspect of hospital management, from patient records and appointment scheduling to billing and analytics.</p>
+          <ul>
+              <li>✔ Cloud-based system for seamless operations</li>
+              <li>✔ Customizable workflows for each department</li>
+              <li>✔ Expandable features as your facility grows</li>
+              <li>✔ Unified management across all branches</li>
+          </ul>
+          <div class="button-group">
+              <button class="about-btn">Start Free Trial</button>
+              <button class="contact-btn">Request Demo</button>
           </div>
       </div>
-    </div>
+      <div class="image-section">
+          <img class="lazy" data-src="{% static 'health/images/doctor2.png' %}" alt="Doctor with stethoscope">
+      </div>
+      <div class="curve"></div>
   </div>
   
   
-    <!-- Optional Search Modal -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="searchModalLabel">Search</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" placeholder="Search...">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Search</button>
-                </div>
+
+    <section class="features" id="features">
+        <h2>Key System Features</h2>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <img class="lazy" data-src="{% static 'health/images/patient1.png' %}" alt="Patient Management">
+                <h3>Patient Management</h3>
+                <p>Streamlined patient records, appointments, and billing management</p>
+            </div>
+            <div class="feature-card fade-in">
+                <img class="lazy" data-src="{% static 'health/images/staff.png' %}" alt="Staff Management">
+                <h3>Staff Management</h3>
+                <p>Efficient scheduling, payroll, and performance tracking</p>
+            </div>
+            <div class="feature-card fade-in">
+                <img class="lazy" data-src="{% static 'health/images/graph.png' %}" alt="Analytics Dashboard">
+                <h3>Analytics Dashboard</h3>
+                <p>Real-time insights and reporting tools</p>
             </div>
         </div>
-    </div>
-    {% endblock %}
+    </section>
+
+    <section class="benefits" id="benefits">
+        <h2>System Benefits</h2>
+        <div class="benefits-grid">
+            <div class="benefit fade-in">
+                <h3>Increased Efficiency</h3>
+                <p>Reduce administrative workload by 50%</p>
+            </div>
+            <div class="benefit fade-in">
+                <h3>Cost Effective</h3>
+                <p>Save up to 30% on operational costs</p>
+            </div>
+            <div class="benefit fade-in">
+                <h3>Easy Integration</h3>
+                <p>Seamless integration with existing systems</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add after features section -->
+    <section class="analytics">
+      <div class="analytics-grid">
+          <div class="counter-box fade-in">
+              <i class="fas fa-hospital icon-counter"></i>
+              <span class="counter" data-target="150">0</span>
+              <h3>Hospitals & Clinics</h3>
+          </div>
+          <div class="counter-box fade-in">
+              <i class="fas fa-users icon-counter"></i>
+              <span class="counter" data-target="5000">0</span>
+              <h3>Registered Users</h3>
+          </div>
+          <div class="counter-box fade-in">
+              <i class="fas fa-handshake icon-counter"></i>
+              <span class="counter" data-target="45">0</span>
+              <h3>Partners</h3>
+          </div>
+      </div>
+  </section>
+  
+
+
+    <section class="testimonials" id="testimonials">
+        <h2>Client Success Stories</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card fade-in">
+                <p>"SHIF+ transformed our hospital operations completely."</p>
+                <h4>- Metro General Hospital</h4>
+            </div>
+            <div class="testimonial-card fade-in">
+                <p>"Reduced our administrative time by 60%"</p>
+                <h4>- City Medical Center</h4>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing-cta" id="contact">
+        <h2>Ready to Streamline Your Hospital Management?</h2>
+        <p>Start your 30-day free trial today</p>
+        <button class="about-btn">Get Started</button>
+    </section>
+    <footer>
+      <div class="footer container-fluid">
+          <div class="logo-container">
+              <img src="{% static 'health/images/logo1.png' %}" alt="TrustCare" class="f-logo">
+              <p class="vision">Our Vision – We strive to be a leader of healthcare innovation that delivers the highest quality care while providing exceptional patient experiences in a modern and inviting environment.</p>
+          </div>
+          <div class="services-treatments">
+              <h3>Services & Treatments</h3>
+              <ul>
+                  <li><a href="#">Employer Membership</a></li>
+                  <li><a href="#">Urgent Care</a></li>
+                  <li><a href="#">Primary Care</a></li>
+                  <li><a href="#">TrustCare Kids</a></li>
+              </ul>
+          </div>
+          <div class="about-us">
+              <h3>About Us</h3>
+              <ul>
+                  <li><a href="#">Insurance</a></li>
+                  <li><a href="#">Contact</a></li>
+                  <li><a href="#">Employee Portal</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Physicians</a></li>
+                  <li><a href="#">Sponsorship Requests</a></li>
+              </ul>
+          </div>
+          <div class="follow-us">
+              <h3>Follow Us</h3>
+              <div class="social-icons">
+                  <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                  <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+          </div>
+      </div>
+  </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const lazyImages = document.querySelectorAll(".lazy");
+            const fadeElements = document.querySelectorAll(".fade-in");
+
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.add("loaded");
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            const fadeObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            lazyImages.forEach(img => imageObserver.observe(img));
+            fadeElements.forEach(element => fadeObserver.observe(element));
+
+            const textSection = document.querySelector(".text-section");
+            textSection.classList.add("visible");
+        });
+    </script>
+
+    <script>
+      const counters = document.querySelectorAll('.counter');
+const speed = 500;
+
+const startCounting = (counter) => {
+    const target = +counter.getAttribute('data-target');
+    const count = +counter.innerText;
+    const increment = target / speed;
+
+    if (count < target) {
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(() => startCounting(counter), 1);
+    } else {
+        counter.innerText = target;
+    }
+};
+
+const counterObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            startCounting(entry.target);
+            observer.unobserve(entry.target);
+        }
+    });
+});
+
+counters.forEach(counter => counterObserver.observe(counter));
+
+    </script>
+</body>
+</html>

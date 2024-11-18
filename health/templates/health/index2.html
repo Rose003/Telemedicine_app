@@ -1,0 +1,205 @@
+{% extends 'health/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'health/css/styles.css' %}">
+{% endblock %}
+
+
+{% block content %}     
+     <!-- Video section -->
+     <div class="video-container">
+        <video controls autoplay muted playsinline>
+            <source src="{% static 'health/videos/afyavideo2.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Generate buttons for letters A-Z -->
+
+<!-- Two-column section -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left column with letter buttons -->
+        <div class="col-md-6">
+    <div class="letter-buttons">
+        <h2 style="display: block; width: 100%; text-align: center;">Find diseases & conditions by first letter</h2>
+        <script>
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            letters.split('').forEach(letter => {
+                document.write(`
+                <button class="letter-button">${letter}</button>`);
+            });
+        </script>
+    </div>
+</div>
+        <!-- Right column with search -->
+        <div class="col-md-6">
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" class="form-control search-input" placeholder="Search conditions...">
+                    <button class="btn btn-primary search-btn">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="disease-list">
+    <!-- The disease/condition list will be dynamically generated here -->
+</div>
+</div>
+
+<!--Section for insurances-->
+<div class="container-fluid bg-white mt-5">
+    <h2 class="text-center mt-2 mb-4">Our Insurance Partners</h2>
+    <div id="insuranceCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#insuranceCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#insuranceCarousel" data-bs-slide-to="1"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="row">
+            <div class="col-2"><img src="{% static 'health/images/old-mutual-logo.png' %}" class="d-block w-100" alt="Old Mutual"></div>
+            <div class="col-2"><img src="{% static 'health/images/jubilee-insurance-logo.png' %}" class="d-block w-100" alt="Jubilee Insurance"></div>
+            <div class="col-2"><img src="{% static 'health/images/aar-insurance-logo.png' %}" class="d-block w-100" alt="AAR Insurance"></div>
+            <div class="col-2"><img src="{% static 'health/images/heritage-insurance-logo.png' %}" class="d-block w-100" alt="Heritage Insurance"></div>
+            <div class="col-2"><img src="{% static 'health/images/madison-insurance-logo.png' %}" class="d-block w-100" alt="Madison Insurance"></div>
+            <div class="col-2"><img src="{% static 'health/images/apa-insurance-logo.png' %}" class="d-block w-100" alt="APA Insurance"></div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="row">
+            <div class="col-2"><img src="{% static 'health/images/kenyan-alliance-insuarance-logo.png' %}" class="d-block w-100" alt="Kenyan Alliance"></div>
+            <div class="col-2"><img src="{% static 'health/images/ga-insurance-logo.png' %}" class="d-block w-100" alt="GA Insurance"></div>
+            <div class="col-2"><img src="{% static 'health/images/mua-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
+            <div class="col-2"><img src="{% static 'health/images/SHIF-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
+            <div class="col-2"><img src="{% static 'health/images/minet-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
+            <div class="col-2"><img src="{% static 'health/images/jubilee-insurance-logo.png' %}" class="d-block w-100" alt="MUA"></div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#insuranceCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#insuranceCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+</div>
+
+  
+
+
+<!--Cards for homepage-->
+<div class="container">
+    <div class="card">
+      <div class="icon">
+        <img src="{% static 'health/images/doctor1.png' %}" alt="" srcset="">
+      </div>
+      <h2>SHIF+</h2>
+      <p>Enroll in a membership and unlock priority access, Rx discounts, + more.</p>
+      <a href="#" class="button">LEARN MORE</a>
+    </div>
+    <div class="card">
+      <div class="icon">
+        <img src="{% static 'health/images/patient1.png' %}" alt="Patient Portal">
+      </div>
+      <h2>Patient Portal</h2>
+      <p>Gain access to test results securely and confidentially.</p>
+      <a href="{% url 'patient_portal' %}" class="button">VIEW PATIENT PORTAL</a>
+    </div>
+    <div class="card">
+      <div class="icon">
+        <img src="{% static 'health/images/monkeypox.png' %}" alt="monkeypox">
+      </div>
+      <h2>MonkeyPox Testing</h2>
+      <p>Everything from testing to treatment, we got you covered.</p>
+      <a href="#" class="button">LEARN MORE</a>
+    </div>
+  </div>      
+
+
+<!--Articles section-->
+<div class="container-fluid bg-light mt-3 py-2">
+    <div class="latest-articles">
+      <h1 class="text-center mb-4">Our Latest Articles</h1>
+      <div class="article-list">
+        <div class="article">
+          <div class="article-image">
+            <img src="{% static 'health/images/polio.png' %}" alt="polio">
+          </div>
+          <div class="article-content">
+            <span class="date">November 6, 2024</span>
+            <span class="category">Polio Vaccination</span>
+            <h2>Join the Fight Against Polio: Together, We Can Eradicate Polio for Good!
+            </h2>
+            <p>Polio is a highly contagious disease that affects children under the age of five, leading to irreversible paralysis and, in some cases, even death. But the good news is that polio is preventable through vaccination! Through collaborative global efforts, we've made incredible strides toward eliminating polio, yet the journey is not over....</p>
+            <a href="#" class="read-more">Read More</a>
+          </div>
+        </div>
+        <div class="article">
+            <div class="article-image">
+              <img src="{% static 'health/images/VCT.png' %}" alt="polio">
+            </div>
+            <div class="article-content">
+              <span class="date">November 9, 2024</span>
+              <span class="category">VCT Services</span>
+              <h2>Voluntary Counseling and Testing (VCT): Take Charge of Your Health</h2>
+              <p>Voluntary Counseling and Testing (VCT) is a critical service that empowers individuals to know their HIV status in a safe, confidential, and supportive environment. Whether you’re seeking clarity, peace of mind, or proactive steps to protect your health, VCT provides the knowledge and tools to help you make informed decisions....</p>
+              <a href="#" class="read-more">Read More</a>
+            </div>
+          </div>
+          <div class="article">
+            <div class="article-image">
+              <img src="{% static 'health/images/cancer.png' %}" alt="polio">
+            </div>
+            <div class="article-content">
+              <span class="date">October 9, 2024</span>
+              <span class="category">Cancer Awareness</span>
+              <h2>Breast Cancer Awareness Month: Early Detection Saves Lives
+            </h2>
+              <p>October is Breast Cancer Awareness Month, a time dedicated to spreading knowledge, fostering understanding, and inspiring action against one of the most common cancers worldwide. Every year, millions come together to support those affected by breast cancer and to empower others with lifesaving information....</p>
+              <a href="#" class="read-more">Read More</a>
+            </div>
+          </div>
+          <div class="article">
+            <div class="article-image">
+              <img src="{% static 'health/images/maternity.png' %}" alt="polio">
+            </div>
+            <div class="article-content">
+              <span class="date">September 30, 2024</span>
+              <span class="category">Maternity Care</span>
+              <h2>Linda Mama: Affordable Maternity Care for Every Mother in Kenya
+            </h2>
+              <p>Linda Mama is a government-led initiative that ensures pregnant women across Kenya have access to free, quality maternal and newborn care. This essential program, run by the National Hospital Insurance Fund (NHIF), aims to reduce maternal and infant mortality by providing financial support and healthcare resources to expectant mothers, regardless of their socio-economic background....</p>
+              <a href="#" class="read-more">Read More</a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  
+  
+    <!-- Optional Search Modal -->
+    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchModalLabel">Search</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" placeholder="Search...">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
