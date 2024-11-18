@@ -21,7 +21,7 @@ class LabReportAnalyzer:
         logger.info("Initializing LabReportAnalyzer")
         self.conn = http.client.HTTPSConnection("copilot5.p.rapidapi.com")
         self.headers = {
-            'x-rapidapi-key': "d35c484194msha36b2157ac188d6p17ddc4jsn651071d2461b",
+    'x-rapidapi-key': "d35c484194msha36b2157ac188d6p17ddc4jsn651071d2461b",
             'x-rapidapi-host': "copilot5.p.rapidapi.com",
             'Content-Type': "application/json"
         }

@@ -9,7 +9,7 @@ import json
 from .ai_service import get_health_insights, get_chatbot_response, translate_text
 from .forms import PatientRegistrationForm
 from django.contrib import messages
-from .models import Patients, Doctors, Admin, HealthLabreport
+from .models import Patients, Doctors, Admin, HealthLabreport, Appointments
 from django.contrib.auth.hashers import make_password, check_password
 from functools import wraps
 import hashlib
@@ -25,6 +25,15 @@ from collections import defaultdict
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import Appointments, Patients, Doctors
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_date, parse_time
+from datetime import datetime
+from django.core.exceptions import ValidationError
+
 
 
 
@@ -390,3 +399,41 @@ def extract_text_from_pdf(file_path):
         text = "Unable to extract text from PDF"
     return text
 
+
+def parse_date(date_string):
+    try:
+        return datetime.strptime(date_string, '%Y-%m-%d').date()
+    except ValueError:
+        return None
+
+def parse_time(time_string):
+    try:
+        return datetime.strptime(time_string, '%H:%M').time()
+    except ValueError:
+        return None
+
+def book_appointment(request):
+    if request.method == 'POST':
+        try:
+            appointment = Appointments.objects.create(
+                patient_id=request.POST.get('patient_id'),
+                doctor_id=request.POST.get('doctor_id'),
+                appointment_date=request.POST.get('appointment_date'),
+                appointment_time=request.POST.get('appointment_time'),
+                status='pending',  # This matches your STATUS_CHOICES
+                created_at=timezone.now(),
+                updated_at=timezone.now()
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Appointment booked successfully',
+                'appointment_id': appointment.id
+            })
+            
+        except Exception as e:
+            print(f"Appointment creation error: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)

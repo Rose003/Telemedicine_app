@@ -20,6 +20,9 @@ urlpatterns = [
     path('labs/', views.labs, name='labs'), 
     path('patient-signup/', views.patient_signup, name='signup'),
     path('login/', views.login_view, name='login'),
+    path('api/book-appointment/', views.book_appointment, name='book_appointment'),
+
+
 
     re_path(r'ws/lab-updates/$', consumers.LabAnalysisConsumer.as_asgi()),
 

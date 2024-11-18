@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 
 class Patients(models.Model):
@@ -82,3 +83,26 @@ class User(AbstractUser):
         help_text='Specific permissions for this user.',
         related_name='health_users'
     )
+
+
+from django.db import models
+from django.core.exceptions import ValidationError
+from datetime import datetime
+
+class Appointments(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    patient = models.ForeignKey('Patients', models.DO_NOTHING)
+    doctor = models.ForeignKey('Doctors', models.DO_NOTHING)
+    appointment_date = models.DateField()
+    appointment_time = models.TimeField()
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'appointments'
