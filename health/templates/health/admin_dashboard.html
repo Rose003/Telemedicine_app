@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <style>
 * {
@@ -113,6 +112,10 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .search-bar {
@@ -122,20 +125,14 @@ body {
     border-radius: 5px;
 }
 
-.user-info {
+.header-actions {
     display: flex;
+    gap: 15px;
     align-items: center;
-    gap: 10px;
-}
-
-.user-info img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
 }
 
 /* Welcome Section */
-.dashboard-content .welcome {
+.welcome {
     background-color: #116466;
     color: #fff;
     padding: 35px 40px;
@@ -155,16 +152,6 @@ body {
 .welcome-content p {
     margin-bottom: 25px;
     opacity: 0.9;
-}
-
-.welcome-content button {
-    padding: 12px 24px;
-    background-color: #2b7a78;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    cursor: pointer;
-    transition: 0.3s ease;
 }
 
 .welcome-image {
@@ -191,41 +178,65 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.stat-item:nth-child(1) span { color: #2b7a78; }
-.stat-item:nth-child(2) span { color: #ff6b6b; }
-.stat-item:nth-child(3) span { color: #4ecdc4; }
-.stat-item:nth-child(4) span { color: #45b7d1; }
-.stat-item:nth-child(5) span { color: #96be25; }
-
 .stat-item span {
     display: block;
     font-size: 1.5em;
     font-weight: bold;
+    margin-top: 10px;
 }
 
-/* Enhanced Table Styles */
-.table {
+/* Doctor Management Section */
+.doctor-management {
     background: white;
-    padding: 25px;
     border-radius: 12px;
-    margin-top: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    width: 100%;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.table h2 {
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
-    color: #333;
-    font-size: 20px;
 }
 
+/* Modal Styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.modal-header {
+    background: #2b7a78;
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 15px 20px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #2b7a78;
+}
+
+.input-group-text {
+    background: #2b7a78;
+    color: white;
+    border: none;
+}
+
+/* Table Styles */
 .table-wrapper {
     overflow-x: auto;
     margin: 0 -5px;
     padding: 5px;
 }
 
-.table table {
+.table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -247,49 +258,9 @@ body {
     border-bottom: 1px solid #eee;
 }
 
-.table tr:hover {
+.table tbody tr:hover {
     background-color: #f8f9fa;
 }
-
-.table tbody tr {
-    transition: all 0.2s ease;
-}
-
-.table input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-}
-
-.table .action-icons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
-
-.table .action-icons i {
-    font-size: 16px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-}
-
-.table .action-icons .edit-icon {
-    color: #2b7a78;
-}
-
-.table .action-icons .delete-icon {
-    color: #ff6b6b;
-}
-
-.table .action-icons i:hover {
-    transform: translateY(-2px);
-    opacity: 0.8;
-}
-.status-confirmed { color: green; }
-.status-pending { color: orange; }
-.status-cancel { color: red; }
 
 /* Responsive Design */
 @media screen and (max-width: 1024px) {
@@ -314,23 +285,8 @@ body {
         left: 0;
     }
 
-    .main-content {
-        margin-left: 0;
-        padding-top: 60px;
-    }
-
     .stats {
         grid-template-columns: repeat(2, 1fr);
-    }
-
-    .welcome {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .welcome-image {
-        width: 100%;
-        max-width: 300px;
     }
 }
 
@@ -347,22 +303,6 @@ body {
     .search-bar {
         width: 100%;
     }
-
-    .table {
-        padding: 15px;
-        margin: 15px -15px;
-        border-radius: 0;
-    }
-    
-    .table-wrapper {
-        margin: 0;
-        padding: 0;
-    }
-    
-    .table td, .table th {
-        padding: 12px;
-        font-size: 14px;
-    }
 }
 </style>
 
@@ -371,7 +311,7 @@ body {
     <div class="dashboard">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">Pre Clinic</div>
+            <div class="logo">ANHIS+</div>
             <ul class="menu">
                 <li><a href="#" class="active">Dashboard</a></li>
                 <li><a href="#">Admin Dashboard</a></li>
@@ -393,6 +333,11 @@ body {
         <main class="main-content">
             <header class="header">
                 <input type="text" placeholder="Search here..." class="search-bar">
+                <div class="header-actions">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                        <i class="fas fa-user-md"></i> Add New Doctor
+                    </button>
+                </div>
             </header>
 
             <section class="dashboard-content">
@@ -400,7 +345,7 @@ body {
                     <div class="welcome-content">
                         <h2>Good Morning, Daniel Bruk</h2>
                         <p>Have a nice day at work.</p>
-                        <button>Create Appointment</button>
+                        <button class="btn btn-light">Create Appointment</button>
                     </div>
                     <img src="{% static 'health/images/doctor2.png' %}" alt="Doctor" class="welcome-image">
                 </div>
@@ -413,92 +358,206 @@ body {
                     <div class="stat-item">Earnings <span>$20,25</span></div>
                 </div>
 
-                <div class="additional-content">
-                    <div class="chart">Patient Visit by Gender</div>
-                    <div class="chart">Patient Department</div>
-                </div>
-
-                <div class="table">
-                    <h2>All Patients</h2>
+                <!-- Doctor Management Section -->
+                <div class="doctor-management">
+                    <div class="section-header">
+                        <h2>Manage Doctors</h2>
+                    </div>
                     <div class="table-wrapper">
-                        <table>
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Patient Name</th>
-                                    <th>Gender</th>
-                                    <th>Age</th>
-                                    <th>Admitted Date</th>
-                                    <th>Type</th>
+                                    <th>Doctor Name</th>
+                                    <th>Specialization</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for doctor in doctors %}
                                 <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>Guy Hawkins</td>
-                                    <td>Male</td>
-                                    <td>27</td>
-                                    <td>07/05/2023</td>
-                                    <td>ECG</td>
-                                    <td class="status-confirmed">Confirmed</td>
+                                    <td>{{ doctor.first_name }} {{ doctor.last_name }}</td>
+                                    <td>{{ doctor.specialization }}</td>
+                                    <td>{{ doctor.email }}</td>
+                                    <td>{{ doctor.phone }}</td>
                                     <td>
-                                        <div class="action-icons">
-                                            <i class="fas fa-edit edit-icon"></i>
-                                            <i class="fas fa-trash-alt delete-icon"></i>
+                                        {% if doctor.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-primary">Edit</button>
+                                            <button class="btn btn-sm btn-danger">Delete</button>
                                         </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td><input type="checkbox"></td>
-                                    <td>Robert Fox</td>
-                                    <td>Female</td>
-                                    <td>25</td>
-                                    <td>18/09/2023</td>
-                                    <td>Sugar Test</td>
-                                    <td class="status-pending">Pending</td>
-                                    <td>
-                                        <div class="action-icons">
-                                            <i class="fas fa-edit edit-icon"></i>
-                                            <i class="fas fa-trash-alt delete-icon"></i>
-                                        </div>
-                                    </td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="checkbox"></td>
-                                        <td>Kathryn</td>
-                                        <td>Male</td>
-                                        <td>32</td>
-                                        <td>16/08/2023</td>
-                                        <td>Checkup</td>
-                                        <td class="status-cancel">Cancel</td>
-                                        <td>
-                                            <div class="action-icons">
-                                                <i class="fas fa-edit edit-icon"></i>
-                                                <i class="fas fa-trash-alt delete-icon"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                </section>
-            </main>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Doctor Modal -->
+    <div class="modal fade" id="addDoctorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Doctor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDoctorForm" method="POST" action="{% url 'add_doctor' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="first_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="last_name" required>
+                            </div>
+                
+                            <!-- Contact Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="number" class="form-control" name="phone" required>
+                            </div>
+                
+                            <!-- Professional Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Specialization</label>
+                                <select class="form-select" name="specialization" required>
+                                    <option value="">Select Specialization</option>
+                                    <option value="Cardiologist">Cardiologist</option>
+                                    <option value="Dermatologist">Dermatologist</option>
+                                    <option value="Pediatrician">Pediatrician</option>
+                                    <option value="Neurologist">Neurologist</option>
+                                    <option value="Orthopedic">Orthopedic</option>
+                                </select>
+                            </div>
+                
+                            <!-- Schedule -->
+                            <div class="col-md-6">
+                                <label class="form-label">Working Days</label>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="schedule[]" value="Monday">
+                                    <label class="form-check-label">Monday</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="schedule[]" value="Tuesday">
+                                    <label class="form-check-label">Tuesday</label>
+                                </div>
+                                <!-- Add other days similarly -->
+                            </div>
+                
+                            <!-- Profile Image -->
+                            <div class="col-md-6">
+                                <label class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" name="image" accept="image/*">
+                            </div>
+                
+                            <!-- Account Information -->
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Temporary Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="temp_password" id="tempPassword" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="generatePassword">
+                                        Generate
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Password Expiry (days)</label>
+                                <input type="number" class="form-control" name="password_duration" value="7" min="1" max="30">
+                            </div>
+                
+                            <!-- Status -->
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="is_active">
+                                    <option value="1" selected>Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="addDoctorForm" class="btn btn-primary">Add Doctor</button>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Menu Toggle
+        document.querySelector('.menu-trigger').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Password Generator
+        document.getElementById('generatePassword').addEventListener('click', function() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('tempPassword').value = password;
+        });
+
+        // Form Submission Handler
+        document.getElementById('addDoctorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
     
-        <script>
-            document.querySelector('.menu-trigger').addEventListener('click', function() {
-                document.querySelector('.sidebar').classList.toggle('active');
-            });
-    
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.sidebar') && !e.target.closest('.menu-trigger')) {
-                    document.querySelector('.sidebar').classList.remove('active');
-                }
-            });
-        </script>
-    </body>
-    </html>
-    
+    // Convert schedule checkboxes to JSON
+    const schedule = {};
+    formData.getAll('schedule[]').forEach(day => {
+        schedule[day] = {
+            "start": "09:00",
+            "end": "17:00"
+        }
+    });
+    formData.set('schedule', JSON.stringify(schedule));
+
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error adding doctor');
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

@@ -2,6 +2,8 @@ from django.urls import path,re_path
 from . import views, consumers
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+
 
 urlpatterns = [
     # Your existing URL patterns
@@ -20,7 +22,10 @@ urlpatterns = [
     path('labs/', views.labs, name='labs'), 
     path('signup/', views.patient_signup, name='signup'),
     path('login/', views.login_view, name='login'),
+    path('medication/', views.medication, name='medication'),
     path('api/book-appointment/', views.book_appointment, name='book_appointment'),
+    path('api/handle-appointment/', views.handle_appointment, name='handle_appointment'),
+    path('add-doctor/', views.add_doctor, name='add_doctor'),
 
 
 

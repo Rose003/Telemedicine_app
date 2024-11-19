@@ -38,10 +38,18 @@ class Doctors(models.Model):
     phone = models.IntegerField()
     schedule = models.JSONField()
     image = models.ImageField(upload_to='doctor_images/', null=True, blank=True)
-
+    
+    # New fields
+    username = models.CharField(max_length=45, unique=True)
+    password_hash = models.CharField(max_length=128)
+    password_expiry = models.DateTimeField(null=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(null=True)
+    is_active = models.BooleanField(default=True) 
     class Meta:
         managed = False
         db_table = 'doctors'
+
 
 class Admin(models.Model):
     admin_id = models.AutoField(primary_key=True)

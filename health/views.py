@@ -33,6 +33,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date, parse_time
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+from django.db import IntegrityError
+from datetime import timedelta
+from django.utils import timezone
 
 
 
@@ -68,56 +72,77 @@ def login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        print(f"Attempting admin login with email: {email}")
+        print(f"Login attempt for: {email}")
 
-        # Try patient login
+        # Doctor Login
+        try:
+            doctor = Doctors.objects.get(email=email)
+            print("Doctor account found")
+            if check_password(password, doctor.password_hash):
+                request.session['user_type'] = 'DOCTOR'
+                request.session['user_id'] = doctor.doctor_id
+                request.session['first_name'] = doctor.first_name
+                
+                # Update last login time
+                doctor.last_login = timezone.now()
+                doctor.save()
+                
+                print("Doctor login successful")
+                return redirect('doctor_dashboard')
+            else:
+                print("Invalid password for doctor account")
+                messages.error(request, 'Invalid credentials')
+                
+        except Doctors.DoesNotExist:
+            print("No doctor account found, checking patient accounts")
+
+        # Patient Login
         try:
             patient = Patients.objects.get(email=email)
+            print("Patient account found")
             if check_password(password, patient.password_hash):
                 request.session['user_type'] = 'PATIENT'
                 request.session['user_id'] = patient.patient_id
-                request.session['first_name'] = patient.first_name  # Add this line here
-
+                request.session['first_name'] = patient.first_name
+                print("Patient login successful")
                 return redirect('patient_dashboard')
+            else:
+                print("Invalid password for patient account")
+                messages.error(request, 'Invalid credentials')
+                
         except Patients.DoesNotExist:
-            pass
+            print("No patient account found, checking admin accounts")
 
-        # Try doctor login
-        try:
-            doctor = Doctors.objects.get(email=email)
-            if check_password(password, doctor.password_hash):
-                request.session['user_type'] = 'DOCTOR'
-                request.session['user_id'] = doctor.id
-                return redirect('doctor_dashboard')
-        except Doctors.DoesNotExist:
-            pass
-
-        # Try admin login from database
+        # Admin Login
         try:
             admin = Admin.objects.get(email=email)
-            print("Admin found")
+            print("Admin account found")
             hashed_password = hashlib.sha1(password.encode()).hexdigest()
-            print(f"Stored hash: {admin.password_hash}")
-            print(f"Input hash: {hashed_password}")
             
             if admin.password_hash == hashed_password:
-                print("Password match successful")
                 request.session['user_type'] = 'ADMIN'
                 request.session['user_id'] = admin.admin_id
                 request.session['role'] = admin.role
+                print("Admin login successful")
                 return redirect('admin_dashboard')
             else:
-                print("Password match failed")
+                print("Invalid password for admin account")
+                messages.error(request, 'Invalid credentials')
+                
         except Admin.DoesNotExist:
-            print("Admin not found")
-              
-        messages.error(request, 'Invalid credentials')
-    
+            print("No admin account found")
+            messages.error(request, 'Invalid credentials')
+
     return render(request, 'health/login.html')
+
 
 
 def patient_portal(request):
     return render(request, 'health/authentication2.html')
+
+def medication(request):
+    return render(request, 'health/medication.html')
+
 
 def login_required(user_type):
     def decorator(view_func):
@@ -132,10 +157,103 @@ def login_required(user_type):
 @login_required('ADMIN')
 def admin_dashboard(request):
     return render(request, 'health/admin_dashboard.html')
+@require_http_methods(["POST"])
+def add_doctor(request):
+    try:
+        # Process schedule data
+        schedule_data = {}
+        for day in request.POST.getlist('schedule[]'):
+            schedule_data[day] = {
+                "start": "09:00",
+                "end": "17:00"
+            }
+
+        # Handle image upload
+        image = request.FILES.get('image')
+        
+        # Create doctor object
+        doctor = Doctors.objects.create(
+            first_name=request.POST['first_name'],
+            last_name=request.POST['last_name'],
+            email=request.POST['email'],
+            phone=request.POST['phone'],
+            specialization=request.POST['specialization'],
+            username=request.POST['username'],
+            password_hash=make_password(request.POST['temp_password']),
+            password_expiry=timezone.now() + timedelta(days=int(request.POST['password_duration'])),
+            schedule=schedule_data,
+            image=image,
+            is_active=bool(int(request.POST.get('is_active', 1))),
+            date_joined=timezone.now()
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Doctor added successfully',
+            'doctor_id': doctor.doctor_id
+        })
+
+    except IntegrityError as e:
+        return JsonResponse({
+            'success': False,
+            'error': 'Email or username already exists'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 @login_required('DOCTOR')
 def doctor_dashboard(request):
-    return render(request, 'health/doctor_dashboard.html')
+    doctor_id = request.session.get('user_id')
+    
+    # Check if doctor exists
+    try:
+        doctor = Doctors.objects.get(doctor_id=doctor_id)
+        pending_appointments = Appointments.objects.filter(
+            doctor_id=doctor_id,
+            status='pending'
+        ).order_by('appointment_date', 'appointment_time')
+        
+        context = {
+            'pending_appointments': pending_appointments,
+            'doctor': doctor
+        }
+        return render(request, 'health/doctor_dashboard.html', context)
+        
+    except Doctors.DoesNotExist:
+        messages.error(request, 'Doctor account not found')
+        return redirect('login')
+    
+@require_http_methods(["POST"])
+def handle_appointment(request):
+    data = json.loads(request.body)
+    appointment_id = data.get('appointment_id')
+    action = data.get('action')
+    
+    try:
+        appointment = Appointments.objects.get(id=appointment_id)
+        
+        if action == 'confirm':
+            appointment.status = 'confirmed'
+        elif action == 'cancel':
+            appointment.status = 'cancelled'
+            
+        appointment.updated_at = timezone.now()
+        appointment.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Appointment {action}ed successfully'
+        })
+        
+    except Appointments.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Appointment not found'
+        }, status=404)
+
 
 @login_required('PATIENT')
 def patient_dashboard(request):

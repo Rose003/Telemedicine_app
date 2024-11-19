@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+        }
+
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header svg {
+            transform: rotate(90deg);
+            cursor: pointer;
+        }
+
+        .plans {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .plan-card {
+            flex: 1;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: box-shadow 0.3s, border 0.3s;
+        }
+
+        .plan-card:hover {
+            border: 1px solid #004a93;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-card input[type="radio"] {
+            display: none;
+        }
+
+        .plan-card label {
+            display: block;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+            color: #002c56;
+        }
+
+        .plan-card .icon {
+            font-size: 50px;
+            color: #004a93;
+            margin-bottom: 10px;
+        }
+
+        .plan-card .description {
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .plan-card.selected {
+            border: 2px solid #004a93;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .register-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            color: #b0b0b0;
+            cursor: not-allowed;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .register-btn.active {
+            background-color: #004a93;
+            color: #ffffff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 6L9 12L15 18" stroke="#004a93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            I will use ANHIS+ for
+        </div>
+        <div class="plans">
+          <div class="plan-card" onclick="selectPlan(this)">
+              <div class="icon">💼</div>
+              <label>Hospital & Clinic Management</label>
+              <div class="description">
+                  <ul>
+                      <li>Premium Package - KSH 9,999/month</li>
+                      <li>Unlimited staff accounts</li>
+                      <li>Multi-branch management</li>
+                      <li>NHIF integration</li>
+                      <li>24/7 local support</li>
+                  </ul>
+              </div>
+          </div>
+          <div class="plan-card" onclick="selectPlan(this)">
+              <div class="icon">👨‍⚕️</div>
+              <label>Single Practice</label>
+              <div class="description">
+                  <ul>
+                      <li>Standard Package - KSH 2,499/month</li>
+                      <li>Up to 3 staff accounts</li>
+                      <li>Single location</li>
+                      <li>Basic NHIF features</li>
+                      <li>Email support</li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+      
+        <button class="register-btn">Register</button>
+    </div>
+
+    <script>
+        const plans = document.querySelectorAll('.plan-card');
+        const registerButton = document.querySelector('.register-btn');
+
+        function selectPlan(selectedCard) {
+    plans.forEach(plan => plan.classList.remove('selected'));
+    selectedCard.classList.add('selected');
+    registerButton.classList.add('active');
+    registerButton.removeAttribute('disabled');
+    
+    // Add this to handle the redirect
+    registerButton.onclick = function() {
+        const planType = selectedCard.querySelector('label').textContent;
+        if (planType === 'Single Practice') {
+            window.location.href = 'signup/';  // Route to individual registration
+        }
+    }
+}
+
+
+    </script>
+</body>
+</html>
