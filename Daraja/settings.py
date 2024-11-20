@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-fb+v$%%j9*6^j-6r5e=u#4y%md2y0l&0i(=q%zix+xfb3)cv=x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default=False).lower() == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
