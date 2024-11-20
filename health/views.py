@@ -44,6 +44,9 @@ from django.utils import timezone
 def home(request):
     return render(request, 'health/index.html')
 
+def get_started(request):
+    return render(request, 'index2.html')
+
 def patient_signup(request):
     if request.method == 'POST':
         print("Form submitted with data:", request.POST)  # Debug print

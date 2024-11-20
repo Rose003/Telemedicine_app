@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/appointment/update-status/', views.update_appointment_status, name='update_appointment_status'),
     path('api/appointment/delete/', views.delete_appointment, name='delete_appointment'),
     path('api/appointments/status/', views.get_appointment_status, name='appointment_status'),
+    path('get_started/', views.get_started, name='get_started'),
 
 
 
