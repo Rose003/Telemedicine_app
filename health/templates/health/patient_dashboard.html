@@ -300,46 +300,61 @@
     <!-- Appointments Section -->
     <div style="background: white; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); flex: 2;">
       <h2 style="color: #2C5494; font-size: 24px; margin-bottom: 24px; font-weight: 600;">Upcoming Appointments</h2>
+  
       {% if upcoming_appointments %}
-        {% for appointment in upcoming_appointments %}
-          <div style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 16px; transition: transform 0.2s ease; border: 1px solid #e9ecef;">
-            <div style="display: flex; align-items: center; margin-bottom: 16px;">
-              <img src="{% static 'health/images/doctor1.png' %}" alt="{{ appointment.doctor.first_name }}" 
-                   style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #2C5494;"/>
-              <div style="margin-left: 16px;">
-                <h3 style="margin: 0; color: #0C2340; font-size: 18px; font-weight: 600;">{{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}</h3>
-                <span style="color: #2C5494; font-size: 14px; display: inline-block; margin-top: 4px;">{{ appointment.doctor.specialization }}</span>
-              </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #e9ecef;">
-              <div style="display: flex; gap: 24px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
-                  <i class="fas fa-calendar"></i>
-                  {{ appointment.appointment_date|date:"D, M d, Y" }}
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
-                  <i class="fas fa-clock"></i>
-                  {{ appointment.appointment_time|time:"g:i A" }}
-                </div>
-              </div>
-              <div style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; text-transform: capitalize; background: #fff3cd; color: #856404;">
-                {{ appointment.status|title }}
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div style="text-align: center; padding: 40px 0; color: #6c757d;">
-          <i class="fas fa-calendar-plus" style="font-size: 48px; margin-bottom: 16px;"></i>
-          <p>No upcoming appointments</p>
-        </div>
-      {% endif %}
-      <a href="{% url 'doctors' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #2C5494; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; margin-top: 20px;">
-        <i class="fas fa-plus"></i>
-        Book New Appointment
-      </a>
-    </div>
+          {% for appointment in upcoming_appointments %}
+              <div data-appointment-id="{{ appointment.id }}" style="background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 16px; transition: transform 0.2s ease; border: 1px solid #e9ecef;">
+                  <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                      <img src="{% static 'health/images/doctor1.png' %}" alt="{{ appointment.doctor.first_name }}"
+                           style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #2C5494;"/>
+                      <div style="margin-left: 16px;">
+                          <h3 style="margin: 0; color: #0C2340; font-size: 18px; font-weight: 600;">
+                              {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}
+                          </h3>
+                          <span style="color: #2C5494; font-size: 14px; display: inline-block; margin-top: 4px;">
+                              {{ appointment.doctor.specialization }}
+                          </span>
+                      </div>
+                  </div>
+  
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #e9ecef;">
+                      <div style="display: flex; gap: 24px;">
+                          <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
+                              <i class="fas fa-calendar"></i>
+                              {{ appointment.appointment_date|date:"D, M d, Y" }}
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 8px; color: #495057; font-size: 14px;">
+                              <i class="fas fa-clock"></i>
+                              {{ appointment.appointment_time|time:"g:i A" }}
+                          </div>
+                      </div>
+  
+<!-- Add this to the status badge div -->
+<!-- In patient_dashboard.html, simplify the status badge -->
+<div class="status-badge" data-status="{{ appointment.status }}">
+  {{ appointment.status|title }}
+</div>
 
+
+
+
+                 
+                  </div>
+              </div>
+          {% endfor %}
+      {% else %}
+          <div style="text-align: center; padding: 40px 0; color: #6c757d;">
+              <i class="fas fa-calendar-plus" style="font-size: 48px; margin-bottom: 16px;"></i>
+              <p>No upcoming appointments</p>
+          </div>
+      {% endif %}
+  
+      <a href="{% url 'doctors' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #2C5494; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; margin-top: 20px;">
+          <i class="fas fa-plus"></i>
+          Book New Appointment
+      </a>
+  </div>
+  
     <!-- Calendar Section -->
     <!-- Calendar Section -->
 <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); flex: 1;">
@@ -895,7 +910,65 @@ document.addEventListener('DOMContentLoaded', function() {
     fileUpload.addEventListener('change', handleFileUpload);
     minimizeButton.addEventListener('click', toggleChat);
 });
+// Function to update appointment status in real-time
+// Add this to patient_dashboard.html
+
+
 </script>
+<script>
+ function updateAppointmentStatus() {
+    fetch('/api/appointments/status/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.appointments.forEach(appointment => {
+            const appointmentElement = document.querySelector(`[data-appointment-id="${appointment.id}"]`);
+            if (appointmentElement) {
+                const statusBadge = appointmentElement.querySelector('.status-badge');
+                const status = appointment.status.toLowerCase();
+                
+                // Apply base styles
+                Object.assign(statusBadge.style, {
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    textTransform: 'capitalize'
+                });
+
+                // Apply status-specific styles
+                const statusStyles = {
+                    pending: {
+                        background: '#fff3cd',
+                        color: '#856404'
+                    },
+                    confirmed: {
+                        background: '#d4edda',
+                        color: '#155724'
+                    },
+                    cancelled: {
+                        background: '#f8d7da',
+                        color: '#721c24'
+                    }
+                };
+
+                Object.assign(statusBadge.style, statusStyles[status]);
+                statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+        });
+    });
+}
+
+// Update every 5 seconds
+setInterval(updateAppointmentStatus, 5000);
+
+// Initial update
+document.addEventListener('DOMContentLoaded', updateAppointmentStatus);
+  </script>
 
     </div>
     {% endblock %}

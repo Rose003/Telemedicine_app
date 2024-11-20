@@ -404,6 +404,7 @@
         padding: 24px;
         box-shadow: 0 4px 12px rgba(12, 35, 64, 0.08);
         margin-top: 24px;
+        margin-bottom:120px;
     }
 
     .request-count {
@@ -521,48 +522,54 @@
     }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.querySelector(".sidebar");
-            sidebar.classList.toggle("active");
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Logger Implementation
+const logger = {
+    info: (message) => console.log(`[INFO] ${new Date().toISOString()}: ${message}`),
+    error: (message, error) => console.error(`[ERROR] ${new Date().toISOString()}: ${message}`, error),
+    warn: (message) => console.warn(`[WARN] ${new Date().toISOString()}: ${message}`)
+};
+
+// CSRF Token Utility
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
+    }
+    return cookieValue;
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            menuToggle.addEventListener('click', function() {
-                this.classList.toggle('active');
-            });
+// Notification System
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} notification`;
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '1000';
+    notification.style.transition = 'opacity 0.3s ease-in-out';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 
-            // Refresh button functionality
-            document.querySelector('.refresh-btn').addEventListener('click', function() {
-                this.classList.add('rotating');
-                setTimeout(() => this.classList.remove('rotating'), 1000);
-                // Add your refresh logic here
-            });
+// Appointment Status Handler
+function handleAppointment(appointmentId, action) {
+    logger.info(`Processing ${action} for appointment ${appointmentId}`);
 
-            // Appointment action buttons
-            document.querySelectorAll('.confirm-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Add confirmation logic here
-                    const requestItem = this.closest('.request-item');
-                    requestItem.style.opacity = '0.5';
-                });
-            });
-
-            document.querySelectorAll('.cancel-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Add cancellation logic here
-                    const requestItem = this.closest('.request-item');
-                    requestItem.style.display = 'none';
-                });
-            });
-        });
-    </script>
-
-    <script>
-        function handleAppointment(appointmentId, action) {
-    fetch('/api/handle-appointment/', {
+    fetch('/api/appointment/update-status/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -570,19 +577,110 @@
         },
         body: JSON.stringify({
             appointment_id: appointmentId,
-            action: action
+            status: action
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            const requestItem = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
-            requestItem.style.opacity = '0';
-            setTimeout(() => requestItem.remove(), 300);
+            const element = document.querySelector(`[data-appointment-id="${appointmentId}"]`);
+            const statusBadge = element.querySelector('.status-badge');
+            statusBadge.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+            updateStatusBadgeStyle(statusBadge, action);
+            element.setAttribute('data-status', action);
+            showNotification(`Appointment ${action}`, 'success');
+            updateAppointmentCount();
         }
+    })
+    .catch(error => {
+        logger.error(`Failed to update appointment ${appointmentId} status`, error);
+        showNotification('Error updating appointment status', 'error');
     });
 }
 
-    </script>
+// UI Update Functions
+function updateStatusBadgeStyle(badge, status) {
+    const statusStyles = {
+        'pending': { bg: '#fff3cd', color: '#856404' },
+        'confirmed': { bg: '#d4edda', color: '#155724' },
+        'cancelled': { bg: '#f8d7da', color: '#721c24' }
+    };
+
+    const style = statusStyles[status.toLowerCase()];
+    if (style) {
+        badge.style.backgroundColor = style.bg;
+        badge.style.color = style.color;
+    }
+}
+
+function updateAppointmentCount() {
+    try {
+        const pendingCount = document.querySelectorAll('[data-status="pending"]').length;
+        const confirmedCount = document.querySelectorAll('[data-status="confirmed"]').length;
+        const cancelledCount = document.querySelectorAll('[data-status="cancelled"]').length;
+
+        document.getElementById('pendingCount').textContent = pendingCount;
+        document.getElementById('confirmedCount').textContent = confirmedCount;
+        document.getElementById('cancelledCount').textContent = cancelledCount;
+    } catch (error) {
+        logger.error('Error updating appointment counts', error);
+    }
+}
+
+// Calendar Implementation
+class Calendar {
+    constructor() {
+        this.currentDate = new Date();
+        this.selectedDate = null;
+        this.appointments = new Map();
+        this.init();
+    }
+
+    init() {
+        this.renderCalendar();
+        this.attachEventListeners();
+    }
+
+    renderCalendar() {
+        // Calendar rendering logic here
+    }
+
+    attachEventListeners() {
+        document.getElementById('prevMonth').addEventListener('click', () => this.navigateMonth(-1));
+        document.getElementById('nextMonth').addEventListener('click', () => this.navigateMonth(1));
+    }
+
+    navigateMonth(direction) {
+        this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+        this.renderCalendar();
+    }
+}
+
+// Initialize Components
+document.addEventListener('DOMContentLoaded', function() {
+    logger.info('Initializing doctor dashboard components');
+    
+    try {
+        new Calendar();
+        
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        
+        // Initialize appointment counts
+        updateAppointmentCount();
+        
+        logger.info('Dashboard components initialized successfully');
+    } catch (error) {
+        logger.error('Error initializing dashboard components', error);
+    }
+});
+</script>
+
+
+
 </body>
 </html>

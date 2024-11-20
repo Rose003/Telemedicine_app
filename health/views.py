@@ -254,6 +254,61 @@ def handle_appointment(request):
             'error': 'Appointment not found'
         }, status=404)
 
+@require_http_methods(["POST"])
+def update_appointment_status(request):
+    data = json.loads(request.body)
+    appointment_id = data.get('appointment_id')
+    status = data.get('status')
+    
+    try:
+        appointment = Appointments.objects.get(id=appointment_id)
+        appointment.status = status
+        appointment.updated_at = timezone.now()
+        appointment.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Appointment {status} successfully'
+        })
+    except Appointments.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Appointment not found'
+        }, status=404)
+
+@require_http_methods(["DELETE"])
+def delete_appointment(request):
+    appointment_id = request.GET.get('id')
+    
+    try:
+        appointment = Appointments.objects.get(id=appointment_id)
+        appointment.delete()
+        return JsonResponse({
+            'success': True,
+            'message': 'Appointment deleted successfully'
+        })
+    except Appointments.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Appointment not found'
+        }, status=404)
+
+@require_http_methods(["GET"])
+def get_appointment_status(request):
+    upcoming_appointments = Appointments.objects.filter(
+        patient_id=request.session.get('user_id'),
+        appointment_date__gte=timezone.now()
+    ).select_related('doctor').values(
+        'id', 'status', 'appointment_date', 'appointment_time',
+        'doctor__first_name', 'doctor__last_name', 'doctor__specialization'
+    )
+    
+    return JsonResponse({
+        'appointments': list(upcoming_appointments)
+    })
+
+
+
 
 @login_required('PATIENT')
 def patient_dashboard(request):
