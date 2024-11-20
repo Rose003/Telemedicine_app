@@ -9,11 +9,10 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import dj_database_url
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-
 # Install python-dotenv package if not already installed
 # Run: pip install python-dotenv
 
@@ -32,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fb+v$%%j9*6^j-6r5e=u#4y%md2y0l&0i(=q%zix+xfb3)cv=x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', default=False).lower() == "True"
 
 ALLOWED_HOSTS = []
 
@@ -95,14 +94,15 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'telemedicine_app',
-        'USER': 'root',
-        'PASSWORD': 'Rolashama33*',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': 'rose',
+        'PASSWORD': 'pTM6IX8Luokiwr3HXabV14U7tg9gOvQX',
+        'HOST': 'dpg-csus75hu0jms73atul30-a',
+        'PORT': '5432',
     }
 }
+DATABASES["default"] = dj_database_url.parse(os.environ.get("DATABASE_URL"))
 
 
 # Password validation
