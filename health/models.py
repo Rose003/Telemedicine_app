@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.db import models
+from django.core.exceptions import ValidationError
+from datetime import datetime
 
 
 class Patients(models.Model):
@@ -15,7 +18,7 @@ class Patients(models.Model):
     address = models.CharField(max_length=45)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'patients'
 
 
@@ -47,7 +50,7 @@ class Doctors(models.Model):
     last_login = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=True) 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'doctors'
 
 
@@ -56,10 +59,15 @@ class Admin(models.Model):
     email = models.CharField(unique=True, max_length=45)
     password_hash = models.CharField(max_length=45)
     role = models.CharField(max_length=5)
+    username = models.CharField(max_length=45, default='admin')
+    profile_image = models.ImageField(upload_to='admin_profiles/', null=True, blank=True, default='doctor1.png')
+    last_login = models.DateTimeField(null=True, blank=True)
+
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'admin'
+
 
 class User(AbstractUser):
     USER_TYPES = (
@@ -92,11 +100,6 @@ class User(AbstractUser):
         related_name='health_users'
     )
 
-
-from django.db import models
-from django.core.exceptions import ValidationError
-from datetime import datetime
-
 class Appointments(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -112,5 +115,21 @@ class Appointments(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'appointments'
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('doctor_login', 'Doctor Login'),
+        ('new_appointment', 'New Appointment'),
+    ]
+    
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    related_doctor = models.ForeignKey(Doctors, on_delete=models.CASCADE, null=True, blank=True)
+    related_appointment = models.ForeignKey(Appointments, on_delete=models.CASCADE, null=True, blank=True)
+
+
+

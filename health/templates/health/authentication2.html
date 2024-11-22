@@ -1,127 +1,314 @@
-{% extends 'health/base.html' %} 
-{% load static %} 
+{% extends 'health/landing_base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - ANHIS+ Healthcare{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'health/css/styles.css' %}" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-
 <style>
-    :root {
-        --primary-dark: #0C2340;
-        --primary-light: #1B3B66;
-        --primary-accent: #2C5494;
+    .anhis_signup_wrapper {
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
     }
 
-    .auth-container {
+    .anhis_signup_container {
         width: 100%;
         max-width: 1200px;
         display: flex;
-        background: white;
-        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(44, 84, 148, 0.2) 0%, rgba(52, 152, 219, 0.2) 100%);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        margin: 120px auto;
-        min-height: 600px;
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: fadeIn 0.8s ease;
+        margin-top:200px;
+        margin-bottom:200px;
     }
 
-    .auth-banner {
+    .anhis_signup_banner {
         flex: 1;
-        background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
-        padding: 40px;
-        color: white;
+        background: var(--gradient-1);
+        padding: 60px;
+        position: relative;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
-    .banner-logo {
-    height: 60px;
-    margin-bottom: 20px;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
-    background: linear-gradient(45deg, #1B3B66, #2C5494);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
 
+    .anhis_signup_banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('{% static "health/images/doctor2.png" %}') center/cover;
+        opacity: 0.15;
+        animation: pulse 4s ease-in-out infinite;
+    }
 
-    .auth-form-container {
-        flex: 2;
-        padding: 40px;
+    .anhis_signup_banner_content {
+        position: relative;
+        z-index: 2;
+        animation: slideInLeft 0.8s ease;
+    }
+
+    .anhis_signup_banner_logo {
+        height: 60px;
+        margin-bottom: 30px;
+        filter: brightness(1.2);
+    }
+
+    .anhis_signup_banner_content h1 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        color: var(--text-light);
+    }
+
+    .anhis_signup_banner_content p {
+        font-size: 1.2em;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .anhis_signup_form_wrapper {
+        flex: 1.2;
+        padding: 60px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
         overflow-y: auto;
     }
-    .auth-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 20px;
-    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
-    border-radius: 10px;
-    color: white;
-}
 
-    .form-row {
+    .anhis_signup_form_row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
-    }
-
-    .form-group {
         margin-bottom: 20px;
     }
 
-    .input-group {
+    .anhis_signup_form_group {
+        margin-bottom: 20px;
+    }
+
+    .anhis_signup_form_group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-light);
+    }
+
+    .anhis_signup_input_group {
         position: relative;
     }
 
-    .input-group i {
+    .anhis_signup_input_group i {
         position: absolute;
-        left: 15px;
+        left: 20px;
         top: 50%;
         transform: translateY(-50%);
-        color: #666;
+        color: var(--text-light);
+        font-size: 1.2em;
     }
 
-    .form-control {
+    .anhis_signup_input_group input,
+    .anhis_signup_input_group select {
         width: 100%;
-        padding: 12px 15px 12px 45px;
-        border: 2px solid #e1e1e1;
-        border-radius: 10px;
+        padding: 15px 20px 15px 50px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
         font-size: 1em;
+        color: var(--text-light);
         transition: all 0.3s ease;
     }
 
-    .auth-btn {
+    .anhis_signup_input_group input:focus,
+    .anhis_signup_input_group select:focus {
+        border-color: var(--primary);
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .anhis_signup_input_group input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .anhis_signup_submit_btn {
         width: 100%;
-        padding: 14px;
-        background: var(--primary-light);
+        padding: 18px;
+        background: var(--primary);
         color: white;
         border: none;
-        border-radius: 10px;
-        font-size: 1em;
+        border-radius: 15px;
+        font-size: 1.1em;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-top: 20px;
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
-    .auth-btn:hover {
-        background: var(--primary-accent);
+    .anhis_signup_submit_btn:hover {
+        background: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(231, 76, 60, 0.2);
     }
 
-    .auth-footer {
+    .anhis_signup_footer {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 30px;
+        color: var(--text-light);
     }
 
-    .auth-footer a {
-        color: var(--primary-light);
+    .anhis_signup_footer a {
+        color: var(--primary);
         text-decoration: none;
         font-weight: 600;
+        transition: color 0.3s ease;
     }
 
+    .anhis_signup_social {
+        margin-top: 40px;
+    }
+
+    .anhis_signup_divider {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 30px 0;
+        color: var(--text-light);
+    }
+
+    .anhis_signup_divider_line {
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Modern Social Button Styling */
+.anhis_signup_social_buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.anhis_signup_social_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.anhis_signup_social_btn.google {
+    background: #ffffff;
+    color: #444;
+    border: 1px solid #dadce0;
+}
+
+.anhis_signup_social_btn.google svg {
+    width: 24px;
+    height: 24px;
+}
+
+.anhis_signup_social_btn.google:hover {
+    background: #f8f9fa;
+    box-shadow: 0 4px 15px rgba(66, 133, 244, 0.2);
+    transform: translateY(-2px);
+}
+
+.anhis_signup_social_btn.facebook {
+    background: #1877f2;
+    color: white;
+    border: none;
+}
+
+.anhis_signup_social_btn.facebook:hover {
+    background: #166fe5;
+    box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3);
+    transform: translateY(-2px);
+}
+
+.anhis_signup_social_btn.apple {
+    background: #000000;
+    color: white;
+    border: none;
+}
+
+.anhis_signup_social_btn.apple:hover {
+    background: #1a1a1a;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+.anhis_signup_nav {
+    margin-top: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nav-tab.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 3px solid var(--primary);
+}
+
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-content {
+    padding: 20px;
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+
+    /* International Telephone Input Styling */
     .iti {
         width: 100%;
-        display: block;
     }
 
     .iti__flag {
@@ -134,17 +321,50 @@
         }
     }
 
-    #phone {
-        padding-left: 90px !important;
+    .iti__selected-flag {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px 0 0 15px;
+    }
+
+    .iti__country-list {
+        background: var(--secondary);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-top: 4px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .iti__country {
+        padding: 10px 15px;
+        color: var(--text-light);
+    }
+
+    .iti__country:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .iti__country.iti__highlight {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .iti__dial-code {
+        color: var(--primary);
     }
 
     @media (max-width: 768px) {
-        .auth-container {
+        .anhis_signup_container {
             flex-direction: column;
-            margin: 20px;
         }
-        
-        .form-row {
+
+        .anhis_signup_banner {
+            padding: 40px;
+        }
+
+        .anhis_signup_form_wrapper {
+            padding: 40px;
+        }
+
+        .anhis_signup_form_row {
             grid-template-columns: 1fr;
         }
     }
@@ -152,149 +372,192 @@
 {% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-banner">
-        <div class="banner-content">
-          <img src="{% static 'health/images/logo1.png' %}" alt="Afyanyumbani Logo" class="banner-logo">
-          <p>Join our healthcare community and experience personalized care at your fingertips.</p>
-        </div>
-    </div>
-    <div class="auth-form-container">
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post" action="{% url 'signup' %}">
-            {% csrf_token %}
-            <div class="form-row">
-                <div class="form-group">
-                    <label>First Name</label>
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="first_name" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Last Name</label>
-                    <div class="input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="last_name" class="form-control" required>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email</label>
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Mobile Number</label>
-                <div class="input-group">
-                    <input type="tel" id="phone" name="phone" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Date of Birth</label>
-                    <div class="input-group">
-                        <i class="fas fa-calendar"></i>
-                        <input type="date" name="date_of_birth" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Gender</label>
-                    <div class="input-group">
-                        <i class="fas fa-venus-mars"></i>
-                        <select name="gender" class="form-control" required>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Address</label>
-                <div class="input-group">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" name="address" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Password</label>
-                    <div class="input-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password_hash" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <div class="input-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="confirm_password" class="form-control" required>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="auth-btn">Create Account</button>
-        </form>
-
-        <div class="auth-footer">
-            <p>Already have an account? <a href="/login">Sign In</a></p>
-        </div>
-
-        <div class="social-login">
-            <div class="divider">
-                <div class="divider-line"></div>
-                <div class="divider-text">Or connect with</div>
-                <div class="divider-line"></div>
-            </div>
-
-            <div class="social-buttons">
-                <a href="#" class="social-btn google">
-                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                    </svg>
-                    <span>Continue with Google</span>
-                </a>
-                <a href="#" class="social-btn facebook">
-                    <i class="fab fa-facebook-f"></i>
-                    <span>Continue with Facebook</span>
-                </a>
-                <a href="#" class="social-btn apple">
-                    <i class="fab fa-apple"></i>
-                    <span>Continue with Apple</span>
-                </a>
+<div class="anhis_signup_wrapper">
+    <div class="anhis_signup_container">
+        <div class="anhis_signup_banner">
+            <div class="anhis_signup_banner_content">
+                <img src="{% static 'health/images/logo1.png' %}" alt="ANHIS+ Logo" class="anhis_signup_banner_logo">
+                <h1>Join ANHIS+</h1>
+                <p>Experience the future of healthcare management. Create your account to access personalized care and seamless health services.</p>
             </div>
         </div>
+
+        <div class="anhis_signup_form_wrapper">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="anhis_signup_alert">
+                        <i class="fas fa-check-circle"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'signup' %}">
+                {% csrf_token %}
+                <div class="anhis_signup_form_row">
+                    <div class="anhis_signup_form_group">
+                        <label>First Name</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="first_name" placeholder="Enter first name" required>
+                        </div>
+                    </div>
+                    <div class="anhis_signup_form_group">
+                        <label>Last Name</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="last_name" placeholder="Enter last name" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="anhis_signup_form_group">
+                    <label>Email Address</label>
+                    <div class="anhis_signup_input_group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="anhis_signup_form_group">
+                    <label>Mobile Number</label>
+                    <div class="anhis_signup_input_group">
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                </div>
+
+                <div class="anhis_signup_form_row">
+                    <div class="anhis_signup_form_group">
+                        <label>Date of Birth</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-calendar"></i>
+                            <input type="date" name="date_of_birth" required>
+                        </div>
+                    </div>
+                    <div class="anhis_signup_form_group">
+                        <label>Gender</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-venus-mars"></i>
+                            <select name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="anhis_signup_form_group">
+                    <label>Address</label>
+                    <div class="anhis_signup_input_group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" name="address" placeholder="Enter your address" required>
+                    </div>
+                </div>
+
+                <div class="anhis_signup_form_row">
+                    <div class="anhis_signup_form_group">
+                        <label>Password</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="password_hash" placeholder="Create password" required>
+                        </div>
+                    </div>
+                    <div class="anhis_signup_form_group">
+                        <label>Confirm Password</label>
+                        <div class="anhis_signup_input_group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="anhis_signup_submit_btn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <div class="anhis_signup_footer">
+                <p>Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+            </div>
+            
+            <div class="anhis_signup_nav">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="social">
+                        <i class="fas fa-share-alt"></i>
+                        Social Sign In
+                    </button>
+                    <button class="nav-tab" data-tab="help">
+                        <i class="fas fa-question-circle"></i>
+                        Help
+                    </button>
+                    <button class="nav-tab" data-tab="contact">
+                        <i class="fas fa-envelope"></i>
+                        Contact
+                    </button>
+                </div>
+            
+                <div class="tab-content" id="social">
+                    <div class="anhis_signup_social_buttons">
+                        <a href="#" class="anhis_signup_social_btn google">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                            </svg>
+                            <span>Continue with Google</span>
+                        </a>
+                        <a href="#" class="anhis_signup_social_btn facebook">
+                            <i class="fab fa-facebook-f"></i>
+                            <span>Continue with Facebook</span>
+                        </a>
+                        <a href="#" class="anhis_signup_social_btn apple">
+                            <i class="fab fa-apple"></i>
+                            <span>Continue with Apple</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 <script>
-    const phoneInputField = document.querySelector("#phone");
-    const phoneInput = window.intlTelInput(phoneInputField, {
-        preferredCountries: ["ke", "ug", "tz", "rw"],
-        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.querySelector("#phone");
+        const iti = window.intlTelInput(phoneInput, {
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            preferredCountries: ['ke', 'ug', 'tz'],
+            separateDialCode: true
+        });
     });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Show corresponding content
+            const tabId = tab.dataset.tab;
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+});
 </script>
 {% endblock %}

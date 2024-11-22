@@ -20,7 +20,7 @@ urlpatterns = [
     path('upload-lab-report/', views.upload_lab_report, name='upload_lab_report'),
     path('delete-report/<int:report_id>/', views.delete_report, name='delete_report'),
     path('labs/', views.labs, name='labs'), 
-    path('signup/', views.patient_signup, name='signup'),
+    path('get_started/signup/', views.patient_signup, name='signup'),
     path('login/', views.login_view, name='login'),
     path('medication/', views.medication, name='medication'),
     path('api/book-appointment/', views.book_appointment, name='book_appointment'),
@@ -30,10 +30,12 @@ urlpatterns = [
     path('api/appointment/delete/', views.delete_appointment, name='delete_appointment'),
     path('api/appointments/status/', views.get_appointment_status, name='appointment_status'),
     path('get_started/', views.get_started, name='get_started'),
+    path('about/', views.about, name='about'),
+    path('update-admin-settings/', views.update_admin_settings, name='update_admin_settings'),
+
 
 
 
     re_path(r'ws/lab-updates/$', consumers.LabAnalysisConsumer.as_asgi()),
 
-]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

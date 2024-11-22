@@ -5,43 +5,44 @@
 <div class="doctors-grid">
     {% for doctor in doctors %}
     <div class="doctor-card stat-card">
-        <div class="doctor-header">
-            <img src="{% static 'health/images/doctor2.png' %}" alt="{{ doctor.name }}" class="doctor-image">
-            <div class="doctor-badge">{{ doctor.specialization }}</div>
-        </div>
-        <div class="doctor-info">
-            <h3 class="doctor-name">{{ doctor.name }}</h3>
-            <div class="doctor-stats">
-                <div class="stat">
-                    <i class="fas fa-user-md"></i>
-                    <span>{{ doctor.experience }} Years</span>
-                </div>
-                <div class="stat">
-                    <div class="star-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+        <div class="doctor-content">
+            <div class="doctor-header">
+                <img src="{{ doctor.image }}" alt="{{ doctor.first_name }} {{ doctor.last_name }}" class="doctor-image">
+            </div>
+            
+            <div class="doctor-info">
+                <div class="doctor-badge">{{ doctor.specialization }}</div>
+                <h3 class="doctor-name">{{ doctor.name }}</h3>
+                <div class="doctor-stats">
+                    <div class="stat">
+                        <i class="fas fa-user-md"></i>
+                        <span>{{ doctor.experience }} Years</span>
                     </div>
-                </div>                
+                    <div class="stat">
+                        <div class="star-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>                
+                </div>
             </div>
-            <div class="doctor-actions">
-                <button class="btn-primary btn-availability" 
-                        data-schedule="{{ doctor.schedule|safe }}" 
-                        data-doctorid="{{ doctor.id }}">
-                    <i class="fas fa-calendar-alt"></i>
-                    Check Availability
-                </button>
-                <button class="btn-secondary btn-book" data-doctorid="{{ doctor.id }}">
-                    <i class="fas fa-clock"></i>
-                    Book Appointment
-                </button>
-            </div>
+        </div>
+        <div class="doctor-actions">
+            <button class="btn-primary btn-availability" data-schedule="{{ doctor.schedule|safe }}" data-doctorid="{{ doctor.id }}">
+                <i class="fas fa-calendar-alt"></i> Check Availability
+            </button>
+            <button class="btn-secondary btn-book" data-doctorid="{{ doctor.id }}">
+                <i class="fas fa-clock"></i> Book Appointment
+            </button>
         </div>
     </div>
     {% endfor %}
 </div>
+
+
 
 <div id="availabilityModal" class="modal">
     <div class="modal-content">

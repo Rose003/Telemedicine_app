@@ -9,7 +9,7 @@ import json
 from .ai_service import get_health_insights, get_chatbot_response, translate_text
 from .forms import PatientRegistrationForm
 from django.contrib import messages
-from .models import Patients, Doctors, Admin, HealthLabreport, Appointments
+from .models import Patients, Doctors, Admin, HealthLabreport, Appointments,Notification
 from django.contrib.auth.hashers import make_password, check_password
 from functools import wraps
 import hashlib
@@ -37,6 +37,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import IntegrityError
 from datetime import timedelta
 from django.utils import timezone
+from django.templatetags.static import static
 
 
 
@@ -45,7 +46,11 @@ def home(request):
     return render(request, 'health/index.html')
 
 def get_started(request):
-    return render(request, 'index2.html')
+    return render(request, 'health/plan.html')
+
+def about(request):
+    return render(request, 'health/about.html')
+
 
 def patient_signup(request):
     if request.method == 'POST':
@@ -85,6 +90,12 @@ def login_view(request):
                 request.session['user_type'] = 'DOCTOR'
                 request.session['user_id'] = doctor.doctor_id
                 request.session['first_name'] = doctor.first_name
+                 # Create notification for doctor login
+                Notification.objects.create(
+                    type='doctor_login',
+                    message=f'Doctor {doctor.first_name} {doctor.last_name} logged in',
+                    related_doctor=doctor
+                )
                 
                 # Update last login time
                 doctor.last_login = timezone.now()
@@ -127,6 +138,9 @@ def login_view(request):
                 request.session['user_id'] = admin.admin_id
                 request.session['role'] = admin.role
                 print("Admin login successful")
+                # Update last login time
+                admin.last_login = timezone.now()
+                admin.save()
                 return redirect('admin_dashboard')
             else:
                 print("Invalid password for admin account")
@@ -159,7 +173,69 @@ def login_required(user_type):
 
 @login_required('ADMIN')
 def admin_dashboard(request):
-    return render(request, 'health/admin_dashboard.html')
+    admin = Admin.objects.get(admin_id=request.session.get('user_id'))
+    doctors = Doctors.objects.all()
+    patients = Patients.objects.all()
+    appointments = Appointments.objects.all()
+    appointments = Appointments.objects.select_related('patient', 'doctor').all()
+    notifications = Notification.objects.all().order_by('-created_at')[:5]  # Get 5 most recent notifications
+    unread_notifications_count = Notification.objects.filter(is_read=False).count()
+    
+    context = {
+        'admin': admin,
+        'doctors': doctors,
+        'appointments': appointments,
+        'doctors_count': doctors.count(),
+        'patients_count': patients.count(),
+        'appointments_count': appointments.count(),
+        'notifications': notifications,
+        'unread_notifications_count': unread_notifications_count
+
+
+    }
+    return render(request, 'health/admin_dashboard.html', context)
+
+@login_required('ADMIN')
+def update_admin_settings(request):
+    if request.method == 'POST':
+        try:
+            admin = Admin.objects.get(admin_id=request.session.get('user_id'))
+            
+            # Update basic info
+            admin.username = request.POST.get('username')
+            admin.email = request.POST.get('email')
+            
+            # Handle password change
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            if current_password and new_password:
+                if check_password(current_password, admin.password_hash):
+                    admin.password_hash = make_password(new_password)
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Current password is incorrect'
+                    })
+            
+            # Handle profile image
+            if 'profile_image' in request.FILES:
+                admin.profile_image = request.FILES['profile_image']
+            
+            admin.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Settings updated successfully'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
 @require_http_methods(["POST"])
 def add_doctor(request):
     try:
@@ -563,7 +639,7 @@ def doctors(request):
             'id': doctor.doctor_id,
             'name': f"{doctor.first_name} {doctor.last_name}",
             'specialization': doctor.specialization,
-            'image': 'doctor1.png',
+            'image': doctor.image.url if doctor.image else static('health/images/doctor1.png'),  # Correct static fallback
             'email': doctor.email,
             'phone': doctor.phone,
             'schedule': doctor.schedule
@@ -612,6 +688,12 @@ def book_appointment(request):
                 status='pending',  # This matches your STATUS_CHOICES
                 created_at=timezone.now(),
                 updated_at=timezone.now()
+            )
+            # Create notification for new appointment
+            Notification.objects.create(
+                type='new_appointment',
+                message=f'New appointment booked for patient ID {appointment.patient_id} with Doctor ID {appointment.doctor_id}',
+                related_appointment=appointment
             )
             
             return JsonResponse({

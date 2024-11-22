@@ -1,0 +1,541 @@
+{% extends 'health/landing_base.html' %}
+{% load static %}
+
+{% block title %}Our Story - ANHIS+ Healthcare{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <video class="hero-video" autoplay muted loop>
+        <source src="{% static 'health/videos/video3.mp4' %}" type="video/mp4">
+    </video>
+    
+    <div class="hero-overlay"></div>
+    
+    <div class="hero-content">
+        <span class="hero-badge">Established 2024</span>
+        <h1>Transforming Healthcare Management</h1>
+        <p>Leading innovation in digital healthcare solutions across Africa</p>
+    </div>
+</section>
+
+<!-- System Showcase -->
+<section class="showcase-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Experience ANHIS+ in Action</h2>
+            <p>Discover how our platform revolutionizes healthcare management</p>
+        </div>
+        <div class="showcase-grid">
+            <div class="row">
+                <div class="showcase-card">
+                    <div class="card-image">
+                        <img src="{% static 'health/images/dashboard-screenshot.png' %}" alt="Dashboard Interface">
+                        <div class="image-overlay">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Intuitive Dashboard</h3>
+                        <p>Real-time analytics and facility management at your fingertips</p>
+                    </div>
+                </div>
+
+                <div class="showcase-card">
+                    <div class="card-image">
+                        <img src="{% static 'health/images/patientdahboard.png' %}" alt="Patient Management">
+                        <div class="image-overlay">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Patient Management</h3>
+                        <p>Streamlined patient records and appointment scheduling</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="showcase-card">
+                    <div class="card-image">
+                        <img src="{% static 'health/images/pharmacy-module.png' %}" alt="Pharmacy Module">
+                        <div class="image-overlay">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Pharmacy Module</h3>
+                        <p>Integrated inventory and prescription management</p>
+                    </div>
+                </div>
+                <div class="showcase-card">
+                    <div class="card-image">
+                        <img src="{% static 'health/images/aianalysis.png' %}" alt="ai">
+                        <div class="image-overlay">
+                            <i class="fas fa-expand"></i>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>AI Lab Analysis</h3>
+                        <p>Advanced machine learning algorithms process lab results with 99.9% accuracy, providing instant insights and anomaly detection. Our system automatically flags critical values and suggests potential diagnoses based on comprehensive data analysis.</p>
+                    </div>
+                </div>
+            </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+<section class="regulatory-bodies">
+    <div class="section-header">
+        <h2>Healthcare Compliance Partners</h2>
+        <p>Meeting Standards with Kenya's Leading Healthcare Authorities</p>
+    </div>
+    
+    <div id="regulatoryCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- First Slide -->
+            <div class="carousel-item active">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/MOH.png' %}" alt="Ministry of Health">
+                            <div class="carousel-caption">
+                                <p>National healthcare policies and standards compliance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/kmpdb.png' %}" alt="KMPDB">
+                            <div class="carousel-caption">
+                                <p>Medical practitioners registration and practice standards</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/nhif.png' %}" alt="NHIF">
+                            <div class="carousel-caption">
+                                <p>Healthcare insurance and claims management</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Second Slide -->
+            <div class="carousel-item">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/kemsa.png' %}" alt="KEMSA">
+                            <div class="carousel-caption">
+                                <p>Medical supplies and equipment standards</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/WHO.png' %}" alt="WHO">
+                            <div class="carousel-caption">
+                                <p>Global healthcare guidelines and best practices</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="carousel-card">
+                            <img src="{% static 'health/images/HIPAA.png' %}" alt="HIPAA">
+                            <div class="carousel-caption">
+                                <p>International healthcare data protection standards</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <button class="carousel-control-prev" type="button" data-bs-target="#regulatoryCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#regulatoryCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+<style>
+/* Base Styles */
+:root {
+    --primary: #3498DB;
+    --secondary: #2C3E50;
+    --accent: #E74C3C;
+    --text-light: #ECF0F1;
+    --gradient-1: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+    --gradient-2: linear-gradient(135deg, #3498DB 0%, #2C3E50 100%);
+}
+
+section {
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.7);
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color: #ffffff;
+    padding: 0 20px;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Showcase Section */
+.showcase-section {
+    background: var(--gradient-2);
+    color: var(--text-light);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+.container {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.showcase-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 40px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.showcase-card {
+    width: 45%; /* This gives some breathing room while maintaining large size */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.card-image {
+    height: 300px;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 30px;
+}
+
+.card-content h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.card-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+
+/* Timeline Section */
+.timeline-section {
+    background: var(--gradient-1);
+    color: var(--text-light);
+}
+
+.timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-50%);
+}
+
+.timeline-item {
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.timeline-content {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    width: calc(50% - 30px);
+    position: relative;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+}
+
+.timeline-date {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Impact Section */
+.impact-section {
+    background: var(--gradient-2);
+    color: var(--text-light);
+}
+
+.impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.impact-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.impact-card:hover {
+    transform: translateY(-10px);
+}
+
+.impact-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.impact-number {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 10px;
+}
+
+.impact-card h3 {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .timeline::before {
+        left: 20px;
+    }
+
+    .timeline-content {
+        width: calc(100% - 50px);
+        margin-left: 50px !important;
+    }
+
+    .impact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.regulatory-bodies {
+    padding: 80px 0;
+    background: var(--gradient-1);
+}
+
+#regulatoryCarousel {
+    width: 100%;
+}
+
+.carousel-inner {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+    padding: 0 15px;
+}
+
+.carousel-card {
+    background: white;
+    border-radius: 15px;
+    height: 100%;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+
+.carousel-caption {
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 15px 0;
+    color: #333;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    width: 5%;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Impact numbers animation
+    const impactNumbers = document.querySelectorAll('.impact-number');
+    
+    const animateNumber = (element) => {
+        const target = parseInt(element.dataset.target);
+        const duration = 2000;
+        const increment = target / duration * 10;
+        let current = 0;
+        
+        const updateCount = () => {
+            if(current < target) {
+                current += increment;
+                element.textContent = Math.min(Math.round(current), target);
+                requestAnimationFrame(updateCount);
+            }
+        };
+        
+        updateCount();
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                animateNumber(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+
+    impactNumbers.forEach(number => observer.observe(number));
+});
+</script>
+
+{% endblock %}

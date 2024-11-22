@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fb+v$%%j9*6^j-6r5e=u#4y%md2y0l&0i(=q%zix+xfb3)cv=x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=False).lower() == "True"
+DEBUG = "True"
 
 ALLOWED_HOSTS = ['*']
 
@@ -162,7 +162,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Media files configuration
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'health', 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR,  'media')
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'patient_dashboard'

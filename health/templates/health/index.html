@@ -5,662 +5,375 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <title>Healthcare Landing Page</title>
-    <style>
-      :root {
-    --primary-dark: #0C2340;
-    --primary-light: #1B3B66;
-    --primary-accent: #2C5494;
+    <link rel="stylesheet" href="{% static 'health/css/landing.css' %}" />
+    <title>ANHIS+ Healthcare Solutions</title>
+</head>
+<body>
+  <nav class="navbar">
+      <div class="logo">ANHIS+</div>
+      <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="{% url 'about' %}">About</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+          <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+      </div>
+  </nav>
+
+  <section class="hero-section">
+    <video class="hero-video" autoplay muted loop>
+        <source src="{% static 'health/videos/video2.mp4' %}" type="video/mp4">
+    </video>
+    
+    <div class="hero-overlay"></div>
+    
+    <div class="text-section">
+        <h1 class="hero-title">Transform Healthcare Management</h1>
+        <p class="hero-description">
+            Revolutionize your healthcare facility with our comprehensive management system.
+            Streamline operations, enhance patient care, and boost efficiency with AI-powered solutions.
+        </p>
+        
+        <div class="feature-highlights">
+            <div class="highlight">
+                <i class="fas fa-cloud"></i>
+                <h3>Cloud-Based</h3>
+                <p>Access anywhere, anytime</p>
+            </div>
+            <div class="highlight">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure</h3>
+                <p>Enterprise-grade security</p>
+            </div>
+            <div class="highlight">
+                <i class="fas fa-chart-line"></i>
+                <h3>Analytics</h3>
+                <p>Data-driven insights</p>
+            </div>
+        </div>
+        
+        <div class="cta-buttons">
+            <button class="btn btn-primary">Start Free Trial</button>
+            <button class="btn btn-secondary">Watch Demo</button>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 7% 5%;
+    overflow: hidden;
 }
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #e6eef3, #ffffff);
-            color: #002c56;
-            overflow-x: hidden;
-        }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        .logo img {
-    height: 40px;
-    width: auto;
-    filter: brightness(0.9);
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
 }
 
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.8);
+    z-index: 2;
+}
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
+.text-section {
+    position: relative;
+    z-index: 3;
+    max-width: 800px;
+}
 
-        .nav-links a {
-            text-decoration: none;
-            color: #002c56;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+}
 
-        .nav-links a:hover {
-            color: #004a93;
-        }
-
-        .container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 50px;
-            height: 100vh;
-            overflow: hidden;
-            margin-top: 60px;
-        }
-
-        .text-section {
-            z-index: 2;
-            max-width: 600px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease-out;
-        }
-
-        .text-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .text-section h4 {
-            font-size: 18px;
-            color: #89b0d3;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .text-section h1 {
-            font-size: 50px;
-            font-weight: bold;
-            color: #002c56;
-            margin-bottom: 20px;
-        }
-
-        .text-section ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .text-section ul li {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        button {
-            padding: 10px 25px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .about-btn {
-            background-color: #004a93;
-            color: white;
-        }
-
-        .contact-btn {
-            background-color: white;
-            border: 2px solid #004a93;
-            color: #004a93;
-        }
-
-        .image-section {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60%;
-            height: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .image-section img {
-            width: auto;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(2px) brightness(0.95);
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .image-section img.loaded {
-            opacity: 0.9;
-        }
-
-        .curve {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px;
-            background: #ffffff;
-            border-radius: 100% 100% 0 0;
-            z-index: 3;
-        }
-
-        /* Features Section */
-        .features {
-            padding: 80px 50px;
-            background: linear-gradient(to bottom, #e6eef3, #ffffff);
-            text-align: center;
-        }
-
-        .features h2 {
-            color: #002c56;
-            font-size: 36px;
-            margin-bottom: 40px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card img {
-            width: 100%;
-            height: 100px;
-            margin-bottom: 20px;
-        }
-
-        .feature-card h3 {
-            color: #004a93;
-            margin-bottom: 15px;
-        }
-
-        /* Benefits Section */
-        .benefits {
-            padding: 80px 50px;
-            background: #ffffff;
-        }
-
-        .benefits h2 {
-            color: #002c56;
-            font-size: 36px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-
-        .benefit {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(to bottom, #e6eef3, #ffffff);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .benefit h3 {
-            color: #004a93;
-            margin-bottom: 15px;
-        }
-        .hero-description {
-    font-size: 18px;
+.hero-description {
+    font-size: 1.2rem;
     line-height: 1.6;
-    margin-bottom: 25px;
-    color: #002c56;
+    margin-bottom: 3rem;
+    color: #ffffff;
+    opacity: 0.9;
 }
 
-
-        /* Testimonials Section */
-        .testimonials {
-            padding: 80px 50px;
-            background: linear-gradient(to bottom, #ffffff, #e6eef3);
-            text-align: center;
-        }
-
-        .testimonials h2 {
-            color: #002c56;
-            font-size: 36px;
-            margin-bottom: 40px;
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .testimonial-card p {
-            font-size: 18px;
-            color: #002c56;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .testimonial-card h4 {
-            color: #004a93;
-            font-weight: 500;
-        }
-
-        /* Pricing CTA Section */
-        .pricing-cta {
-            padding: 80px 50px;
-            text-align: center;
-            background: linear-gradient(to bottom, #e6eef3, #ffffff);
-        }
-
-        .pricing-cta h2 {
-            color: #002c56;
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .pricing-cta p {
-            color: #004a93;
-            font-size: 20px;
-            margin-bottom: 30px;
-        }
-
-        /* Animation Classes */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease-out;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .image-section {
-                position: relative;
-                width: 100%;
-                height: 50vh;
-                margin-top: 2rem;
-            }
-
-            .text-section {
-                max-width: 100%;
-            }
-
-            .features,
-            .benefits,
-            .testimonials,
-            .pricing-cta {
-                padding: 40px 20px;
-            }
-
-            .testimonials-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .feature-card,
-            .benefit,
-            .testimonial-card {
-                padding: 20px;
-            }
-        }
-footer {
-    background-color: var(--primary-dark);
-    color: white;
-    padding: 4rem 0;
-}
-
-.footer {
+.feature-highlights {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+    margin-bottom: 3rem;
 }
 
-.f-logo {
-    height: 60px;
+.highlight {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.highlight i {
+    font-size: 2rem;
+    color: var(--primary);
     margin-bottom: 1rem;
 }
 
-.footer ul {
-    list-style: none;
-    padding: 0;
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.footer ul li {
-    margin-bottom: 0.5rem;
-}
-
-.footer ul li a {
+.btn-primary {
+    background: var(--primary);
     color: white;
-    text-decoration: none;
-    transition: color 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
 }
 
-.footer ul li a:hover {
-    color: #ffd700;
-}
-
-.social-icons {
-    display: flex;
-    gap: 1rem;
-}
-
-.social-icon {
+.btn-secondary {
+    background: transparent;
+    border: 2px solid var(--primary);
     color: white;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
 }
 
-.social-icon:hover {
-    color: #ffd700;
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
-.analytics {
-    padding: 60px 0;
-    background: linear-gradient(to right, #e6eef3, #ffffff);
-    text-align: center;
-}
-
-.analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: 30px;
-}
-
-.counter-box {
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-.counter {
-    font-size: 48px;
-    font-weight: bold;
-    color: #004a93;
-}
-
-.counter-box h3 {
-    color: #002c56;
-    margin-top: 10px;
-    font-size: 20px;
-}
-.icon-counter {
-    font-size: 32px;
-    color: #004a93;
-    opacity: 0.8;
-}
+</style>
 
 
-        
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-      <div class="logo">
-        <img src="{% static 'health/images/logo1.png' %}" alt="SHIF+" class="logo">
-    </div>
-          <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#features">Features</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="#contact">Contact</a>
-        </div>
-    </nav>
-
-    <div class="container" id="home">
-      <div class="text-section">
-          <h4>Transform Your Healthcare Management</h4>
-          <h1>Streamline Hospital Operations with ANHIS+</h1>
-          <p class="hero-description">Whether you're managing a single facility or multiple hospital branches, ANHIS+ adapts to your needs. Our comprehensive system delivers end-to-end solutions for every aspect of hospital management, from patient records and appointment scheduling to billing and analytics.</p>
-          <ul>
-              <li>✔ Cloud-based system for seamless operations</li>
-              <li>✔ Customizable workflows for each department</li>
-              <li>✔ Expandable features as your facility grows</li>
-              <li>✔ Unified management across all branches</li>
-          </ul>
-          <div class="button-group">
-              <button class="about-btn">Start Free Trial</button>
-              <button class="contact-btn">Request Demo</button>
+  <section class="stats-section">
+      <div class="stats-grid">
+          <div class="stat-card">
+              <div class="stat-number" data-target="500">0</div>
+              <p>Healthcare Facilities</p>
           </div>
-      </div>
-      <div class="image-section">
-          <img class="lazy" data-src="{% static 'health/images/doctor2.png' %}" alt="Doctor with stethoscope">
-      </div>
-      <div class="curve"></div>
-  </div>
-  
-  
-
-    <section class="features" id="features">
-        <h2>Key System Features</h2>
-        <div class="features-grid">
-            <div class="feature-card fade-in">
-                <img class="lazy" data-src="{% static 'health/images/patient1.png' %}" alt="Patient Management">
-                <h3>Patient Management</h3>
-                <p>Streamlined patient records, appointments, and billing management</p>
-            </div>
-            <div class="feature-card fade-in">
-                <img class="lazy" data-src="{% static 'health/images/staff.png' %}" alt="Staff Management">
-                <h3>Staff Management</h3>
-                <p>Efficient scheduling, payroll, and performance tracking</p>
-            </div>
-            <div class="feature-card fade-in">
-                <img class="lazy" data-src="{% static 'health/images/graph.png' %}" alt="Analytics Dashboard">
-                <h3>Analytics Dashboard</h3>
-                <p>Real-time insights and reporting tools</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="benefits" id="benefits">
-        <h2>System Benefits</h2>
-        <div class="benefits-grid">
-            <div class="benefit fade-in">
-                <h3>Increased Efficiency</h3>
-                <p>Reduce administrative workload by 50%</p>
-            </div>
-            <div class="benefit fade-in">
-                <h3>Cost Effective</h3>
-                <p>Save up to 30% on operational costs</p>
-            </div>
-            <div class="benefit fade-in">
-                <h3>Easy Integration</h3>
-                <p>Seamless integration with existing systems</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Add after features section -->
-    <section class="analytics">
-      <div class="analytics-grid">
-          <div class="counter-box fade-in">
-              <i class="fas fa-hospital icon-counter"></i>
-              <span class="counter" data-target="150">0</span>
-              <h3>Hospitals & Clinics</h3>
+          <div class="stat-card">
+              <div class="stat-number" data-target="1000000">0</div>
+              <p>Patients Served</p>
           </div>
-          <div class="counter-box fade-in">
-              <i class="fas fa-users icon-counter"></i>
-              <span class="counter" data-target="5000">0</span>
-              <h3>Registered Users</h3>
+          <div class="stat-card">
+              <div class="stat-number" data-target="99.9">0</div>
+              <p>Uptime</p>
           </div>
-          <div class="counter-box fade-in">
-              <i class="fas fa-handshake icon-counter"></i>
-              <span class="counter" data-target="45">0</span>
-              <h3>Partners</h3>
+          <div class="stat-card">
+              <div class="stat-number" data-target="24">0</div>
+              <p>Support</p>
           </div>
       </div>
   </section>
-  
+  <!-- Features Showcase Section -->
+<section class="features-showcase">
+  <div class="section-header">
+      <h2>Powerful Features</h2>
+      <p>Everything you need to manage your healthcare facility efficiently</p>
+  </div>
+  <div class="features-grid">
+      <div class="feature-card">
+          <i class="fas fa-user-md"></i>
+          <h3>Doctor Management</h3>
+          <p>Efficiently manage schedules, appointments, and patient assignments</p>
+      </div>
+      <div class="feature-card">
+          <i class="fas fa-procedures"></i>
+          <h3>Patient Care</h3>
+          <p>Complete patient history, treatment plans, and progress tracking</p>
+      </div>
+      <div class="feature-card">
+          <i class="fas fa-pills"></i>
+          <h3>Pharmacy Integration</h3>
+          <p>Automated prescription management and inventory control</p>
+      </div>
+      <div class="feature-card">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Analytics Dashboard</h3>
+          <p>Real-time insights and performance metrics</p>
+      </div>
+  </div>
+</section>
 
-
-    <section class="testimonials" id="testimonials">
-        <h2>Client Success Stories</h2>
-        <div class="testimonials-grid">
-            <div class="testimonial-card fade-in">
-                <p>"SHIF+ transformed our hospital operations completely."</p>
-                <h4>- Metro General Hospital</h4>
-            </div>
-            <div class="testimonial-card fade-in">
-                <p>"Reduced our administrative time by 60%"</p>
-                <h4>- City Medical Center</h4>
-            </div>
-        </div>
-    </section>
-
-    <section class="pricing-cta" id="contact">
-        <h2>Ready to Streamline Your Hospital Management?</h2>
-        <p>Start your 30-day free trial today</p>
-        <a href="{% url 'get_started' %}"><button class="about-btn">Get Started</button></a>
-      </section>
-    <footer>
-      <div class="footer container-fluid">
-          <div class="logo-container">
-              <img src="{% static 'health/images/logo1.png' %}" alt="TrustCare" class="f-logo">
-              <p class="vision">Our Vision – We strive to be a leader of healthcare innovation that delivers the highest quality care while providing exceptional patient experiences in a modern and inviting environment.</p>
-          </div>
-          <div class="services-treatments">
-              <h3>Services & Treatments</h3>
-              <ul>
-                  <li><a href="#">Employer Membership</a></li>
-                  <li><a href="#">Urgent Care</a></li>
-                  <li><a href="#">Primary Care</a></li>
-                  <li><a href="#">TrustCare Kids</a></li>
-              </ul>
-          </div>
-          <div class="about-us">
-              <h3>About Us</h3>
-              <ul>
-                  <li><a href="#">Insurance</a></li>
-                  <li><a href="#">Contact</a></li>
-                  <li><a href="#">Employee Portal</a></li>
-                  <li><a href="#">Careers</a></li>
-                  <li><a href="#">Physicians</a></li>
-                  <li><a href="#">Sponsorship Requests</a></li>
-              </ul>
-          </div>
-          <div class="follow-us">
-              <h3>Follow Us</h3>
-              <div class="social-icons">
-                  <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                  <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                  <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+<!-- Testimonials Section -->
+<section class="testimonials">
+  <div class="section-header">
+      <h2>What Our Clients Say</h2>
+      <p>Success stories from healthcare providers worldwide</p>
+  </div>
+  <div class="testimonials-grid">
+      <div class="testimonial-card">
+          <div class="quote">"ANHIS+ transformed our hospital operations completely. The efficiency gains are remarkable."</div>
+          <div class="author">
+              <img src="{% static 'health/images/doctor1.png' %}" alt="Dr. Sarah">
+              <div class="author-info">
+                  <h4>Dr. Sarah Johnson</h4>
+                  <p>Chief of Medicine, Metro General</p>
               </div>
           </div>
       </div>
+      <div class="testimonial-card">
+          <div class="quote">"The AI-powered insights have helped us improve patient care significantly."</div>
+          <div class="author">
+              <img src="{% static 'health/images/doctor2.png' %}" alt="Dr. Michael">
+              <div class="author-info">
+                  <h4>Dr. Michael Chen</h4>
+                  <p>Director, City Health Center</p>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="pricing">
+  <div class="section-header">
+      <h2>Simple, Transparent Pricing</h2>
+      <p>Choose the perfect plan for your facility</p>
+  </div>
+  <div class="pricing-grid">
+      <div class="pricing-card">
+          <div class="plan-name">Starter</div>
+          <div class="price">$299<span>/month</span></div>
+          <ul class="features-list">
+              <li><i class="fas fa-check"></i> Up to 10 doctors</li>
+              <li><i class="fas fa-check"></i> Basic analytics</li>
+              <li><i class="fas fa-check"></i> Patient portal</li>
+              <li><i class="fas fa-check"></i> 24/7 support</li>
+          </ul>
+          <button class="btn btn-primary">Get Started</button>
+      </div>
+      <div class="pricing-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <div class="plan-name">Professional</div>
+          <div class="price">$499<span>/month</span></div>
+          <ul class="features-list">
+              <li><i class="fas fa-check"></i> Up to 50 doctors</li>
+              <li><i class="fas fa-check"></i> Advanced analytics</li>
+              <li><i class="fas fa-check"></i> AI insights</li>
+              <li><i class="fas fa-check"></i> Priority support</li>
+          </ul>
+          <button class="btn btn-primary">Get Started</button>
+      </div>
+      <div class="pricing-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="price">Custom</div>
+          <ul class="features-list">
+              <li><i class="fas fa-check"></i> Unlimited doctors</li>
+              <li><i class="fas fa-check"></i> Custom solutions</li>
+              <li><i class="fas fa-check"></i> Dedicated support</li>
+              <li><i class="fas fa-check"></i> On-premise option</li>
+          </ul>
+          <button class="btn btn-secondary">Contact Sales</button>
+      </div>
+  </div>
+</section>
+
+
+  <footer>
+      <div class="footer-content">
+          <div class="footer-info">
+              <h4>ANHIS+</h4>
+              <p>Leading the future of healthcare management with innovative solutions and cutting-edge technology.</p>
+              <div class="social-links">
+                  <a href="#"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#"><i class="fab fa-twitter"></i></a>
+                  <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                  <a href="#"><i class="fab fa-instagram"></i></a>
+              </div>
+          </div>
+          <div class="footer-links">
+              <h5>Solutions</h5>
+              <ul>
+                  <li><a href="#">Hospital Management</a></li>
+                  <li><a href="#">Patient Care</a></li>
+                  <li><a href="#">Analytics</a></li>
+                  <li><a href="#">Security</a></li>
+              </ul>
+          </div>
+          <div class="footer-links">
+              <h5>Company</h5>
+              <ul>
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Press</a></li>
+                  <li><a href="#">Contact</a></li>
+              </ul>
+          </div>
+          <div class="footer-links">
+              <h5>Resources</h5>
+              <ul>
+                  <li><a href="#">Documentation</a></li>
+                  <li><a href="#">Support</a></li>
+                  <li><a href="#">Blog</a></li>
+                  <li><a href="#">Newsletter</a></li>
+              </ul>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <p>&copy; 2024 ANHIS+. All rights reserved.</p>
+      </div>
   </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const lazyImages = document.querySelectorAll(".lazy");
-            const fadeElements = document.querySelectorAll(".fade-in");
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Animated counter function
+          const counters = document.querySelectorAll('.stat-number');
+          const speed = 200;
 
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.classList.add("loaded");
-                        observer.unobserve(img);
-                    }
-                });
-            });
+          const animateCounter = (counter) => {
+              const target = parseFloat(counter.getAttribute('data-target'));
+              let count = 0;
+              const increment = target / speed;
 
-            const fadeObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("visible");
-                        observer.unobserve(entry.target);
-                    }
-                });
-            });
+              const updateCount = () => {
+                  if (count < target) {
+                      count += increment;
+                      counter.innerText = Math.ceil(count).toLocaleString();
+                      requestAnimationFrame(updateCount);
+                  } else {
+                      counter.innerText = target.toLocaleString();
+                  }
+              };
 
-            lazyImages.forEach(img => imageObserver.observe(img));
-            fadeElements.forEach(element => fadeObserver.observe(element));
+              updateCount();
+          };
 
-            const textSection = document.querySelector(".text-section");
-            textSection.classList.add("visible");
-        });
-    </script>
+          // Intersection Observer for counter animation
+          const observerOptions = {
+              threshold: 0.5
+          };
 
-    <script>
-      const counters = document.querySelectorAll('.counter');
-const speed = 500;
+          const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                  if (entry.isIntersecting) {
+                      animateCounter(entry.target);
+                      observer.unobserve(entry.target);
+                  }
+              });
+          }, observerOptions);
 
-const startCounting = (counter) => {
-    const target = +counter.getAttribute('data-target');
-    const count = +counter.innerText;
-    const increment = target / speed;
-
-    if (count < target) {
-        counter.innerText = Math.ceil(count + increment);
-        setTimeout(() => startCounting(counter), 1);
-    } else {
-        counter.innerText = target;
-    }
-};
-
-const counterObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            startCounting(entry.target);
-            observer.unobserve(entry.target);
-        }
-    });
-});
-
-counters.forEach(counter => counterObserver.observe(counter));
-
-    </script>
+          counters.forEach(counter => observer.observe(counter));
+      });
+  </script>
 </body>
 </html>
