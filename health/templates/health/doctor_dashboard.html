@@ -73,12 +73,12 @@
                         </div>
                         <div class="metric-data">
                             <h3>Total Consultations</h3>
-                            <p class="metric-value">2.9K</p>
-                            <span class="trend-positive">+6.6% last month</span>
+                            <p class="metric-value">{{ total_consultations }}</p>
+                            <span class="trend-positive">{{ consultation_trend }} last month</span>
                         </div>
                     </div>
                 </div>
-
+            
                 <div class="tile-wrapper">
                     <div class="metric-card">
                         <div class="metric-icon">
@@ -86,8 +86,8 @@
                         </div>
                         <div class="metric-data">
                             <h3>Appointments</h3>
-                            <p class="metric-value">3.2K</p>
-                            <span class="trend-negative">-0.2% last month</span>
+                            <p class="metric-value">{{ total_appointments }}</p>
+                            <span class="trend-negative">{{ appointment_trend }} last month</span>
                         </div>
                     </div>
                 </div>
@@ -128,31 +128,26 @@
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
-                    <div class="timeline-wrapper">
-                        <div class="timeline-item active">
-                            <div class="time-slot">09:00 AM</div>
-                            <div class="appointment-card">
-                                <img src="{% static 'health/images/patient1.png' %}" alt="Patient">
-                                <div class="appointment-info">
-                                    <h4>John Doe</h4>
-                                    <p>General Checkup</p>
-                                    <span class="status-badge ongoing">In Progress</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="timeline-item">
-                            <div class="time-slot">10:30 AM</div>
-                            <div class="appointment-card">
-                                <img src="{% static 'health/images/patient2.png' %}" alt="Patient">
-                                <div class="appointment-info">
-                                    <h4>Sarah Smith</h4>
-                                    <p>Follow-up Consultation</p>
-                                    <span class="status-badge upcoming">Upcoming</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   <!-- Today's Schedule -->
+<div class="timeline-wrapper">
+    {% for appointment in todays_appointments %}
+    <div class="timeline-item {% if appointment.status == 'ongoing' %}active{% endif %}">
+        <div class="time-slot">{{ appointment.appointment_time|time:"h:i A" }}</div>
+        <div class="appointment-card">
+            <img src="{{ appointment.patient.profile_image.url|default:'static/health/images/default-avatar.png' }}" alt="Patient">
+            <div class="appointment-info">
+                <h4>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</h4>
+                <p>{{ appointment.appointment_type }}</p>
+                <span class="status-badge {{ appointment.status }}">{{ appointment.status|title }}</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-4">
+        <p>No appointments scheduled for today</p>
+    </div>
+    {% endfor %}
+</div>
                 </div>
 
                 <div class="patient-queue">
@@ -161,27 +156,24 @@
                         <div class="queue-count">12 patients</div>
                     </div>
                     <div class="queue-list">
+                        {% for appointment in waiting_list %}
                         <div class="queue-item">
                             <div class="queue-info">
-                                <img src="{% static 'health/images/patient3.png' %}" alt="Patient">
+                                <img src="{{ appointment.patient.profile_image.url|default:'static/health/images/default-avatar.png' }}" alt="Patient">
                                 <div>
-                                    <h4>Michael Brown</h4>
-                                    <p>Emergency Consultation</p>
+                                    <h4>{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</h4>
+                                    <p>{{ appointment.appointment_type }}</p>
                                 </div>
                             </div>
-                            <span class="wait-time urgent">15 min wait</span>
+                            <span class="wait-time {% if appointment.is_urgent %}urgent{% endif %}">
+                                {{ appointment.appointment_time|time:"h:i A" }}
+                            </span>
                         </div>
-
-                        <div class="queue-item">
-                            <div class="queue-info">
-                                <img src="{% static 'health/images/patient4.png' %}" alt="Patient">
-                                <div>
-                                    <h4>Emily Wilson</h4>
-                                    <p>Regular Checkup</p>
-                                </div>
-                            </div>
-                            <span class="wait-time">30 min wait</span>
+                        {% empty %}
+                        <div class="text-center py-4">
+                            <p>No patients in waiting list</p>
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

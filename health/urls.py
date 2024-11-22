@@ -32,6 +32,8 @@ urlpatterns = [
     path('get_started/', views.get_started, name='get_started'),
     path('about/', views.about, name='about'),
     path('update-admin-settings/', views.update_admin_settings, name='update_admin_settings'),
+    path('delete-doctor/<int:doctor_id>/', views.delete_doctor, name='delete_doctor'),
+
 
 
 

@@ -180,7 +180,8 @@ def admin_dashboard(request):
     appointments = Appointments.objects.select_related('patient', 'doctor').all()
     notifications = Notification.objects.all().order_by('-created_at')[:5]  # Get 5 most recent notifications
     unread_notifications_count = Notification.objects.filter(is_read=False).count()
-    
+    working_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
     context = {
         'admin': admin,
         'doctors': doctors,
@@ -189,7 +190,9 @@ def admin_dashboard(request):
         'patients_count': patients.count(),
         'appointments_count': appointments.count(),
         'notifications': notifications,
-        'unread_notifications_count': unread_notifications_count
+        'unread_notifications_count': unread_notifications_count,
+        'working_days': working_days  
+
 
 
     }
@@ -209,13 +212,15 @@ def update_admin_settings(request):
             current_password = request.POST.get('current_password')
             new_password = request.POST.get('new_password')
             if current_password and new_password:
-                if check_password(current_password, admin.password_hash):
-                    admin.password_hash = make_password(new_password)
+                current_password_hash = hashlib.sha1(current_password.encode()).hexdigest()
+                if current_password_hash == admin.password_hash:
+                    admin.password_hash = hashlib.sha1(new_password.encode()).hexdigest()
                 else:
                     return JsonResponse({
                         'success': False,
                         'message': 'Current password is incorrect'
                     })
+            
             
             # Handle profile image
             if 'profile_image' in request.FILES:
@@ -239,9 +244,14 @@ def update_admin_settings(request):
 @require_http_methods(["POST"])
 def add_doctor(request):
     try:
-        # Process schedule data
+        # Process schedule data with default working hours
         schedule_data = {}
-        for day in request.POST.getlist('schedule[]'):
+        working_days = request.POST.getlist('schedule[]')
+        if not working_days:
+            # Set default schedule if none selected
+            working_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+            
+        for day in working_days:
             schedule_data[day] = {
                 "start": "09:00",
                 "end": "17:00"
@@ -259,11 +269,17 @@ def add_doctor(request):
             specialization=request.POST['specialization'],
             username=request.POST['username'],
             password_hash=make_password(request.POST['temp_password']),
-            password_expiry=timezone.now() + timedelta(days=int(request.POST['password_duration'])),
             schedule=schedule_data,
             image=image,
-            is_active=bool(int(request.POST.get('is_active', 1))),
+            is_active=True,
             date_joined=timezone.now()
+        )
+
+        # Create notification
+        Notification.objects.create(
+            type='new_doctor',
+            message=f'New doctor {doctor.first_name} {doctor.last_name} has been added',
+            related_doctor=doctor
         )
 
         return JsonResponse({
@@ -272,38 +288,65 @@ def add_doctor(request):
             'doctor_id': doctor.doctor_id
         })
 
-    except IntegrityError as e:
-        return JsonResponse({
-            'success': False,
-            'error': 'Email or username already exists'
-        }, status=400)
     except Exception as e:
+        print(f"Error adding doctor: {str(e)}")  # Add debugging
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=400)
 
+
 @login_required('DOCTOR')
 def doctor_dashboard(request):
     doctor_id = request.session.get('user_id')
     
-    # Check if doctor exists
     try:
         doctor = Doctors.objects.get(doctor_id=doctor_id)
-        pending_appointments = Appointments.objects.filter(
-            doctor_id=doctor_id,
+        
+        # Get all appointments for this doctor
+        all_appointments = Appointments.objects.filter(doctor_id=doctor_id)
+        
+        # Get pending appointments
+        pending_appointments = all_appointments.filter(
             status='pending'
         ).order_by('appointment_date', 'appointment_time')
         
+        # Get today's appointments
+        today = timezone.now().date()
+        todays_appointments = all_appointments.filter(
+            appointment_date=today
+        ).order_by('appointment_time')
+        
+        # Calculate statistics
+        total_consultations = all_appointments.filter(status='completed').count()
+        total_appointments = all_appointments.count()
+        pending_reviews = all_appointments.filter(status='pending').count()
+        
+        # Get waiting list (upcoming appointments)
+        waiting_list = all_appointments.filter(
+            appointment_date__gte=today,
+            status='confirmed'
+        ).order_by('appointment_date', 'appointment_time')[:5]
+        
         context = {
+            'doctor': doctor,
             'pending_appointments': pending_appointments,
-            'doctor': doctor
+            'todays_appointments': todays_appointments,
+            'total_consultations': total_consultations,
+            'total_appointments': total_appointments,
+            'pending_reviews': pending_reviews,
+            'waiting_list': waiting_list,
+            'consultation_trend': '+6.6%',  # You can calculate this based on historical data
+            'appointment_trend': '-0.2%',   # You can calculate this based on historical data
+            'rating': '4.8'                 # You can calculate this based on reviews
         }
+        
         return render(request, 'health/doctor_dashboard.html', context)
         
     except Doctors.DoesNotExist:
         messages.error(request, 'Doctor account not found')
         return redirect('login')
+
     
 @require_http_methods(["POST"])
 def handle_appointment(request):
@@ -708,3 +751,26 @@ def book_appointment(request):
                 'success': False,
                 'error': str(e)
             }, status=400)
+        
+@require_http_methods(["DELETE"])
+def delete_doctor(request, doctor_id):
+    try:
+        doctor = Doctors.objects.get(doctor_id=doctor_id)
+        doctor.delete()
+        
+        # Create notification for doctor deletion
+        Notification.objects.create(
+            type='doctor_deleted',
+            message=f'Doctor {doctor.first_name} {doctor.last_name} has been removed from the system'
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Doctor deleted successfully'
+        })
+    except Doctors.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Doctor not found'
+        }, status=404)
+
