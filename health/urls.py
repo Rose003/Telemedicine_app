@@ -31,8 +31,13 @@ urlpatterns = [
     path('api/appointments/status/', views.get_appointment_status, name='appointment_status'),
     path('get_started/', views.get_started, name='get_started'),
     path('about/', views.about, name='about'),
+    path('contact/', views.contact, name='contact'),
     path('update-admin-settings/', views.update_admin_settings, name='update_admin_settings'),
     path('delete-doctor/<int:doctor_id>/', views.delete_doctor, name='delete_doctor'),
+    path('send-contact-email/', views.send_contact_email, name='send_contact_email'),
+    path('role/', views.role, name='role'),
+
+
 
 
 

@@ -15,7 +15,7 @@
           <a href="#features">Features</a>
           <a href="{% url 'about' %}">About</a>
           <a href="#pricing">Pricing</a>
-          <a href="#contact">Contact</a>
+          <a href="{% url 'contact' %}">Contact</a>
           <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
       </div>
   </nav>
@@ -53,7 +53,7 @@
         </div>
         
         <div class="cta-buttons">
-            <button class="btn btn-primary">Start Free Trial</button>
+            <a href="{% url 'role' %}" class="btn btn-primary" style="text-decoration: none;">Start Free Trial</a>
             <button class="btn btn-secondary">Watch Demo</button>
         </div>
     </div>

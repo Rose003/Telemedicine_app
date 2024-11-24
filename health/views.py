@@ -159,6 +159,10 @@ def patient_portal(request):
 
 def medication(request):
     return render(request, 'health/medication.html')
+def contact(request):
+    return render(request, 'health/contect.html')
+def role(request):
+    return render(request,'health/role.html')
 
 
 def login_required(user_type):
@@ -774,3 +778,43 @@ def delete_doctor(request, doctor_id):
             'error': 'Doctor not found'
         }, status=404)
 
+import http.client
+import json
+from django.http import JsonResponse
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def send_contact_email(request):
+    if request.method == 'POST':
+        # Get form data with default values
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        subject = request.POST.get('subject', 'New Contact Inquiry')
+        message = request.POST.get('message', '')
+        
+        conn = http.client.HTTPSConnection("mail-sender-api1.p.rapidapi.com")
+        
+        
+        # Format the payload as a raw string
+        payload = f"""{{
+            "sendto": "okemwaroselyn@gmail.com",
+            "name": "user2024",
+            "replyTo": "admin@go-mail.us.to",
+            "ishtml": "false",
+            "title": "{subject}",
+            "body": "from: {name}\\nEmail: {email}\\n\\nMessage:\\n{message}"
+        }}"""
+        
+        headers = {
+        'x-rapidapi-key': "84ab80797emsh4b2b532eb8764b7p19fb6fjsn3bef2a7e0c71",
+            'x-rapidapi-host': "mail-sender-api1.p.rapidapi.com",
+            'Content-Type': "application/json"
+        }
+        
+        conn.request("POST", "/", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        
+        return JsonResponse({'success': True, 'response': data.decode("utf-8")})
+    
+    return JsonResponse({'success': False})

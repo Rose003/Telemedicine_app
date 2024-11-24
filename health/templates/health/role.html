@@ -1,0 +1,662 @@
+{% extends 'health/landing_base.html' %}
+
+{% block content %}
+<section class="setup-journey-section">
+    <div class="setup-container">
+        <!-- Role Selection -->
+        <div class="setup-stage" id="stage-role" data-stage="1">
+            <h2 class="setup-title">Choose Your Role</h2>
+            <p class="setup-description">Select how you'll be using ANHIS+</p>
+            
+            <div class="role-cards">
+                <div class="role-card" data-role="clinic-admin">
+                    <i class="fas fa-hospital-user"></i>
+                    <h3>Clinic Administrator</h3>
+                    <p>Manage your healthcare facility</p>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check"></i> Full facility management</li>
+                        <li><i class="fas fa-check"></i> Staff administration</li>
+                        <li><i class="fas fa-check"></i> Analytics dashboard</li>
+                    </ul>
+                </div>
+                
+                <div class="role-card" data-role="doctor">
+                    <i class="fas fa-user-md"></i>
+                    <h3>Healthcare Professional</h3>
+                    <p>Provide care to patients</p>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check"></i> Patient management</li>
+                        <li><i class="fas fa-check"></i> Appointment scheduling</li>
+                        <li><i class="fas fa-check"></i> Medical records</li>
+                    </ul>
+                </div>
+
+                <div class="role-card" data-role="patient">
+                    <i class="fas fa-user"></i>
+                    <h3>Patient</h3>
+                    <p>Access your healthcare services</p>
+                    <ul class="role-features">
+                        <li><i class="fas fa-check"></i> Book appointments</li>
+                        <li><i class="fas fa-check"></i> View medical history</li>
+                        <li><i class="fas fa-check"></i> Telemedicine access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="setup-stage hidden" id="stage-info" data-stage="2">
+            <h2 class="setup-title">Basic Information</h2>
+            <p class="setup-description">Tell us about yourself or your facility</p>
+            
+            <form class="setup-form" id="basicInfoForm" method="POST">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="full_name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" required placeholder="Create a password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="password_confirm" required placeholder="Confirm your password">
+                    </div>
+                    <div class="form-group clinic-field hidden">
+                        <label>Facility Name</label>
+                        <input type="text" name="facility_name" placeholder="Enter facility name">
+                    </div>
+                    <div class="form-group clinic-field hidden">
+                        <label>Facility Type</label>
+                        <select name="facility_type">
+                            <option value="">Select Facility Type</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="clinic">Clinic</option>
+                            <option value="laboratory">Laboratory</option>
+                            <option value="pharmacy">Pharmacy</option>
+                        </select>
+                    </div>
+                    <div class="form-group doctor-field hidden">
+                        <label>Specialization</label>
+                        <select name="specialization">
+                            <option value="">Select Specialization</option>
+                            <option value="general">General Practice</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="dermatology">Dermatology</option>
+                        </select>
+                    </div>
+                    <div class="form-group doctor-field hidden">
+                        <label>License Number</label>
+                        <input type="text" name="license_number" placeholder="Enter medical license number">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Verification -->
+        <div class="setup-stage hidden" id="stage-verify" data-stage="3">
+            <h2 class="setup-title">Verification</h2>
+            <p class="setup-description">Verify your identity and credentials</p>
+            
+            <div class="verification-container">
+                <div class="upload-section">
+                    <div class="upload-box">
+                        <i class="fas fa-upload"></i>
+                        <h4>Upload ID</h4>
+                        <p>Government-issued ID or License</p>
+                        <button class="btn-upload" data-type="id">Choose File</button>
+                        <div class="upload-status"></div>
+                    </div>
+                    <div class="upload-box doctor-field hidden">
+                        <i class="fas fa-certificate"></i>
+                        <h4>Medical License</h4>
+                        <p>Valid medical practice license</p>
+                        <button class="btn-upload" data-type="license">Choose File</button>
+                        <div class="upload-status"></div>
+                    </div>
+                    <div class="upload-box clinic-field hidden">
+                        <i class="fas fa-building"></i>
+                        <h4>Facility Registration</h4>
+                        <p>Business registration documents</p>
+                        <button class="btn-upload" data-type="registration">Choose File</button>
+                        <div class="upload-status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete -->
+        <div class="setup-stage hidden" id="stage-complete" data-stage="4">
+            <div class="completion-content">
+                <i class="fas fa-check-circle"></i>
+                <h2 class="setup-title">Setup Complete!</h2>
+                <p class="setup-description">Your account is being verified. We'll notify you once it's ready.</p>
+                <button class="btn-dashboard">Continue</button>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="setup-navigation">
+            <button class="btn-back hidden">Back</button>
+            <button class="btn-next" disabled>Next Step</button>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="setup-progress">
+            <div class="progress-step active" data-step="1">
+                <div class="step-number">1</div>
+                <span>Role Selection</span>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-number">2</div>
+                <span>Basic Info</span>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-number">3</div>
+                <span>Verification</span>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-number">4</div>
+                <span>Complete</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.setup-journey-section {
+    min-height: 100vh;
+    padding: 120px 5% 5%;
+    position: relative;
+    color: #fff;
+    overflow: hidden;
+}
+
+.setup-journey-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/static/health/images/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.3);
+    z-index: 1;
+}
+
+.setup-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.setup-title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.setup-description {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 3rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.role-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.role-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2.5rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.role-card:hover {
+    transform: translateY(-8px);
+    border-color: #0ea5e9;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.role-card.selected {
+    border-color: #0ea5e9;
+    background: rgba(14, 165, 233, 0.2);
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+}
+
+.role-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #0ea5e9;
+}
+
+.role-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.role-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+}
+
+.role-features li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.role-features i {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.setup-form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #0ea5e9;
+    outline: none;
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
+
+.btn-next,
+.btn-back,
+.btn-dashboard {
+    padding: 1rem 2.5rem;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-next,
+.btn-dashboard {
+    background: #0ea5e9;
+    color: white;
+    border: none;
+}
+
+.btn-next:hover,
+.btn-dashboard:hover {
+    background: #0284c7;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4);
+}
+
+.btn-back {
+    background: transparent;
+    border: 2px solid #0ea5e9;
+    color: white;
+}
+
+.btn-back:hover {
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.setup-navigation {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.setup-progress {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: 3rem auto;
+    position: relative;
+    padding: 0 20px;
+}
+
+.progress-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.8rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+    background: #0ea5e9;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
+}
+
+.verification-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.upload-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.upload-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.upload-status {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.upload-status.success {
+    background: rgba(14, 165, 233, 0.2);
+    color: #0ea5e9;
+}
+
+.upload-status.error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.btn-upload {
+    margin-top: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: #0ea5e9;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-upload:hover {
+    background: #0284c7;
+    transform: translateY(-2px);
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .setup-title {
+        font-size: 2.2rem;
+    }
+    
+    .setup-description {
+        font-size: 1.1rem;
+    }
+    
+    .progress-step span {
+        display: none;
+    }
+    
+    .role-card {
+        padding: 1.5rem;
+    }
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentStage = 1;
+    let selectedRole = null;
+    let uploadedFiles = new Set();
+    
+    const roleCards = document.querySelectorAll('.role-card');
+    const btnNext = document.querySelector('.btn-next');
+    const btnBack = document.querySelector('.btn-back');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const form = document.getElementById('basicInfoForm');
+
+    // Role selection handling
+    roleCards.forEach(card => {
+        card.addEventListener('click', function() {
+            roleCards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedRole = this.dataset.role;
+            btnNext.disabled = false;
+        });
+    });
+
+    // Form validation
+    const validateForm = () => {
+        const password = form.querySelector('input[name="password"]').value;
+        const confirmPassword = form.querySelector('input[name="password_confirm"]').value;
+        
+        if (password !== confirmPassword) {
+            showError('Passwords do not match');
+            return false;
+        }
+        
+        if (password.length < 8) {
+            showError('Password must be at least 8 characters long');
+            return false;
+        }
+
+        if (selectedRole === 'doctor' && !form.querySelector('input[name="license_number"]').value) {
+            showError('License number is required for doctors');
+            return false;
+        }
+
+        return true;
+    };
+
+    // File upload handling
+    const handleFileUpload = async (file, type) => {
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('type', type);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        try {
+            const response = await fetch('/upload-verification-doc/', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                uploadedFiles.add(type);
+                updateUploadStatus(type, true);
+                checkStageCompletion();
+            }
+        } catch (error) {
+            updateUploadStatus(type, false);
+            console.error('Upload failed:', error);
+        }
+    };
+
+    // Navigation handling
+    btnNext.addEventListener('click', function() {
+        if (currentStage === 1 && !selectedRole) {
+            showError('Please select a role to continue');
+            return;
+        }
+        
+        if (currentStage === 2 && !validateForm()) {
+            return;
+        }
+
+        if (currentStage < 4) {
+            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.add('hidden');
+            currentStage++;
+            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.remove('hidden');
+            
+            updateProgress();
+            updateNavigation();
+            
+            if (currentStage === 2) {
+                showRelevantFields();
+            }
+        }
+    });
+
+    btnBack.addEventListener('click', function() {
+        if (currentStage > 1) {
+            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.add('hidden');
+            currentStage--;
+            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.remove('hidden');
+            
+            updateProgress();
+            updateNavigation();
+        }
+    });
+
+    // Dashboard redirect
+    document.querySelector('.btn-dashboard').addEventListener('click', function() {
+        switch(selectedRole) {
+            case 'clinic-admin':
+                window.location.href = "{% url 'login' %}";
+                break;
+            case 'doctor':
+                window.location.href = "{% url 'login' %}";
+                break;
+            case 'patient':
+                window.location.href = "{% url 'signup' %}";
+                break;
+            default:
+                window.location.href = "{% url 'home' %}";
+        }
+    });
+
+    // Helper functions
+    function getStageId(stage) {
+        const stages = ['role', 'info', 'verify', 'complete'];
+        return stages[stage - 1];
+    }
+
+    function updateProgress() {
+        progressSteps.forEach(step => {
+            const stepNum = parseInt(step.dataset.step);
+            step.classList.toggle('active', stepNum <= currentStage);
+        });
+    }
+
+    function updateNavigation() {
+        btnBack.classList.toggle('hidden', currentStage === 1);
+        btnNext.classList.toggle('hidden', currentStage === 4);
+        btnNext.disabled = true;
+        
+        if (currentStage === 4) {
+            document.querySelector('.btn-dashboard').classList.remove('hidden');
+        }
+    }
+
+    function showRelevantFields() {
+        const clinicFields = document.querySelectorAll('.clinic-field');
+        const doctorFields = document.querySelectorAll('.doctor-field');
+        
+        clinicFields.forEach(field => {
+            field.classList.toggle('hidden', selectedRole !== 'clinic-admin');
+        });
+        
+        doctorFields.forEach(field => {
+            field.classList.toggle('hidden', selectedRole !== 'doctor');
+        });
+    }
+
+    function updateUploadStatus(type, success) {
+        const uploadBox = document.querySelector(`.upload-box[data-type="${type}"]`);
+        const statusDiv = uploadBox.querySelector('.upload-status');
+        statusDiv.textContent = success ? 'Upload successful' : 'Upload failed';
+        statusDiv.className = `upload-status ${success ? 'success' : 'error'}`;
+    }
+
+    function checkStageCompletion() {
+        const requiredUploads = selectedRole === 'doctor' ? 2 : 1;
+        btnNext.disabled = uploadedFiles.size < requiredUploads;
+    }
+
+    function showError(message) {
+        // Implement your preferred error display method
+        alert(message);
+    }
+});
+</script>
+{% endblock %}
