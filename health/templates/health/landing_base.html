@@ -19,6 +19,12 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="logo">ANHIS+</div>
+<div class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="{% url 'about' %}">About</a>
@@ -79,6 +85,19 @@
         </div>
     </footer>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+});
+</script>
+
+    {% endblock %}
 </body>
 </html>
