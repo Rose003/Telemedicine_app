@@ -36,6 +36,12 @@ urlpatterns = [
     path('delete-doctor/<int:doctor_id>/', views.delete_doctor, name='delete_doctor'),
     path('send-contact-email/', views.send_contact_email, name='send_contact_email'),
     path('role/', views.role, name='role'),
+    path('upload-verification-doc/', views.upload_verification_doc, name='upload_verification_doc'),
+    path('handle_registration/', views.handle_registration, name='handle_registration'),
+    path('clinic-dashboard/', views.clinic_dashboard, name='clinic_dashboard'),
+
+
+
 
 
 

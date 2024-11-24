@@ -20,13 +20,11 @@
     <nav class="navbar">
         <div class="logo">ANHIS+</div>
         <div class="nav-links">
-            {% block nav_links %}
             <a href="#features">Features</a>
-            <a href="#about">About</a>
+            <a href="{% url 'about' %}">About</a>
             <a href="#pricing">Pricing</a>
-            <a href="#contact">Contact</a>
+            <a href="{% url 'contact' %}">Contact</a>
             <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-            {% endblock %}
         </div>
     </nav>
 

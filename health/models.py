@@ -73,9 +73,11 @@ class User(AbstractUser):
     USER_TYPES = (
         ('ADMIN', 'Admin'),
         ('DOCTOR', 'Doctor'),
-        ('PATIENT', 'Patient')
+        ('PATIENT', 'Patient'),
+        ('CLINIC_ADMIN', 'Clinic Administrator'),
+        ('HEALTH_PROFESSIONAL', 'Healthcare Professional'),
     )
-    user_type = models.CharField(max_length=10, choices=USER_TYPES)
+    user_type = models.CharField(max_length=25, choices=USER_TYPES)
     email = models.EmailField(unique=True)
 
     class Meta:
@@ -131,5 +133,55 @@ class Notification(models.Model):
     related_doctor = models.ForeignKey(Doctors, on_delete=models.CASCADE, null=True, blank=True)
     related_appointment = models.ForeignKey(Appointments, on_delete=models.CASCADE, null=True, blank=True)
 
+class ClinicAdmin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    facility_name = models.CharField(max_length=200)
+    facility_type = models.CharField(max_length=100, choices=[
+        ('HOSPITAL', 'Hospital'),
+        ('CLINIC', 'Clinic'),
+        ('LABORATORY', 'Laboratory'),
+        ('PHARMACY', 'Pharmacy')
+    ])
+    facility_id = models.CharField(max_length=10, unique=True, editable=False)
+    verification_status = models.CharField(max_length=20, default='pending')
+    documents = models.FileField(upload_to='clinic_documents/')
+
+    def save(self, *args, **kwargs):
+        if not self.facility_id:
+            prefix = self.facility_type[:3].upper()
+            last_facility = ClinicAdmin.objects.filter(
+                facility_id__startswith=prefix
+            ).order_by('-facility_id').first()
+            
+            if last_facility:
+                last_number = int(last_facility.facility_id[3:])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+                
+            self.facility_id = f"{prefix}{new_number:03d}"
+        super().save(*args, **kwargs)
+
+class HealthProfessional(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    specialization = models.CharField(max_length=100)
+    license_number = models.CharField(max_length=100)
+    verification_status = models.CharField(max_length=20, default='pending')
+    medical_license = models.FileField(upload_to='medical_documents/')
+    professional_id = models.CharField(max_length=10, unique=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.professional_id:
+            prefix = 'HP'
+            last_professional = HealthProfessional.objects.order_by('-professional_id').first()
+            
+            if last_professional:
+                last_number = int(last_professional.professional_id[2:])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+                
+            self.professional_id = f"{prefix}{new_number:03d}"
+        super().save(*args, **kwargs)
 
 

@@ -7,27 +7,44 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 <style>
     .anhis_signup_wrapper {
-        min-height: calc(100vh - 80px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
+    position: relative;
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .anhis_signup_container {
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        background: linear-gradient(135deg, rgba(44, 84, 148, 0.2) 0%, rgba(52, 152, 219, 0.2) 100%);
-        backdrop-filter: blur(10px);
-        border-radius: 30px;
-        overflow: hidden;
-        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        animation: fadeIn 0.8s ease;
-        margin-top:200px;
-        margin-bottom:200px;
-    }
+
+.anhis_signup_wrapper::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('/static/health/images/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    filter: brightness(0.3);
+    z-index: -1;
+}
+.anhis_signup_container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.8s ease;
+    margin: 100px 0;
+}
 
     .anhis_signup_banner {
         flex: 1;
@@ -374,13 +391,6 @@
 {% block content %}
 <div class="anhis_signup_wrapper">
     <div class="anhis_signup_container">
-        <div class="anhis_signup_banner">
-            <div class="anhis_signup_banner_content">
-                <img src="{% static 'health/images/logo1.png' %}" alt="ANHIS+ Logo" class="anhis_signup_banner_logo">
-                <h1>Join ANHIS+</h1>
-                <p>Experience the future of healthcare management. Create your account to access personalized care and seamless health services.</p>
-            </div>
-        </div>
 
         <div class="anhis_signup_form_wrapper">
             {% if messages %}

@@ -20,7 +20,7 @@
                     </ul>
                 </div>
                 
-                <div class="role-card" data-role="doctor">
+                <div class="role-card" data-role="health-professional">
                     <i class="fas fa-user-md"></i>
                     <h3>Healthcare Professional</h3>
                     <p>Provide care to patients</p>
@@ -51,10 +51,15 @@
             
             <form class="setup-form" id="basicInfoForm" method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="selectedRole" id="selectedRole">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" name="full_name" required placeholder="Enter your full name">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" required placeholder="Enter your first name">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" required placeholder="Enter your last name">
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
@@ -76,10 +81,10 @@
                         <label>Facility Type</label>
                         <select name="facility_type">
                             <option value="">Select Facility Type</option>
-                            <option value="hospital">Hospital</option>
-                            <option value="clinic">Clinic</option>
-                            <option value="laboratory">Laboratory</option>
-                            <option value="pharmacy">Pharmacy</option>
+                            <option value="HOSPITAL">Hospital</option>
+                            <option value="CLINIC">Clinic</option>
+                            <option value="LABORATORY">Laboratory</option>
+                            <option value="PHARMACY">Pharmacy</option>
                         </select>
                     </div>
                     <div class="form-group doctor-field hidden">
@@ -109,21 +114,21 @@
             
             <div class="verification-container">
                 <div class="upload-section">
-                    <div class="upload-box">
+                    <div class="upload-box" data-type="id">
                         <i class="fas fa-upload"></i>
                         <h4>Upload ID</h4>
                         <p>Government-issued ID or License</p>
                         <button class="btn-upload" data-type="id">Choose File</button>
                         <div class="upload-status"></div>
                     </div>
-                    <div class="upload-box doctor-field hidden">
+                    <div class="upload-box doctor-field hidden" data-type="license">
                         <i class="fas fa-certificate"></i>
                         <h4>Medical License</h4>
                         <p>Valid medical practice license</p>
                         <button class="btn-upload" data-type="license">Choose File</button>
                         <div class="upload-status"></div>
                     </div>
-                    <div class="upload-box clinic-field hidden">
+                    <div class="upload-box clinic-field hidden" data-type="registration">
                         <i class="fas fa-building"></i>
                         <h4>Facility Registration</h4>
                         <p>Business registration documents</p>
@@ -171,6 +176,7 @@
         </div>
     </div>
 </section>
+
 
 <style>
 .setup-journey-section {
@@ -375,6 +381,42 @@
     position: relative;
     padding: 0 20px;
 }
+.setup-progress::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.setup-progress::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--accent-color);
+    z-index: 1;
+    transition: width 0.5s ease;
+}
+
+.setup-progress[data-progress="25"]::after { width: 25%; }
+.setup-progress[data-progress="50"]::after { width: 50%; }
+.setup-progress[data-progress="75"]::after { width: 75%; }
+.setup-progress[data-progress="100"]::after { width: 100%; }
+
+.progress-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    background: var(--primary-bg);
+    padding: 0 10px;
+}
+
 
 .progress-step {
     position: relative;
@@ -458,6 +500,32 @@
 .hidden {
     display: none;
 }
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.file-preview i {
+    color: var(--accent-color);
+}
+
+.file-preview .remove-file {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.file-preview .remove-file:hover {
+    color: #ff0000;
+}
+
 
 @media (max-width: 768px) {
     .form-grid {
@@ -495,85 +563,158 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressSteps = document.querySelectorAll('.progress-step');
     const form = document.getElementById('basicInfoForm');
 
-    // Role selection handling
+    // Role selection handling with logging
     roleCards.forEach(card => {
         card.addEventListener('click', function() {
             roleCards.forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
             selectedRole = this.dataset.role;
+            document.getElementById('selectedRole').value = selectedRole;
+            console.log('Role selected:', selectedRole);
             btnNext.disabled = false;
         });
     });
 
-    // Form validation
-    const validateForm = () => {
+    // Form validation with input tracking
+    const formInputs = form.querySelectorAll('input, select');
+    formInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            console.log(`Input ${input.name} changed:`, input.value);
+            if (currentStage === 2) {
+                validateStageTwo();
+            }
+        });
+    });
+
+    function validateStageTwo() {
+        const requiredFields = form.querySelectorAll('[required]');
         const password = form.querySelector('input[name="password"]').value;
         const confirmPassword = form.querySelector('input[name="password_confirm"]').value;
         
-        if (password !== confirmPassword) {
-            showError('Passwords do not match');
-            return false;
-        }
+        let allFieldsFilled = Array.from(requiredFields).every(field => field.value.trim() !== '');
+        console.log('All fields filled:', allFieldsFilled);
+        console.log('Passwords match:', password === confirmPassword);
         
-        if (password.length < 8) {
-            showError('Password must be at least 8 characters long');
-            return false;
+        if (allFieldsFilled && password === confirmPassword && password.length >= 8) {
+            btnNext.disabled = false;
+        } else {
+            btnNext.disabled = true;
         }
+    }
 
-        if (selectedRole === 'doctor' && !form.querySelector('input[name="license_number"]').value) {
-            showError('License number is required for doctors');
-            return false;
-        }
-
-        return true;
-    };
-
-    // File upload handling
-    const handleFileUpload = async (file, type) => {
-        const formData = new FormData();
-        formData.append('document', file);
-        formData.append('type', type);
-        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-        try {
-            const response = await fetch('/upload-verification-doc/', {
-                method: 'POST',
-                body: formData
-            });
+    // File upload handling with status tracking
+    const uploadButtons = document.querySelectorAll('.btn-upload');
+    uploadButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*,.pdf';
             
-            if (response.ok) {
-                uploadedFiles.add(type);
-                updateUploadStatus(type, true);
-                checkStageCompletion();
-            }
-        } catch (error) {
-            updateUploadStatus(type, false);
-            console.error('Upload failed:', error);
-        }
-    };
+            fileInput.click();
+            
+            fileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log('File selected:', file.name);
+                    const uploadType = this.dataset.type;
+                    await handleFileUpload(file, uploadType);
+                }
+            };
+        });
+    });
 
-    // Navigation handling
+    // Navigation handling with stage tracking
     btnNext.addEventListener('click', function() {
-        if (currentStage === 1 && !selectedRole) {
-            showError('Please select a role to continue');
-            return;
-        }
+        console.log('Current stage:', currentStage);
         
-        if (currentStage === 2 && !validateForm()) {
+        if (currentStage === 1) {
+            if (!selectedRole) {
+                showNotification('Please select a role to continue', 'error');
+                return;
+            }
+
+            if (selectedRole === 'patient') {
+                window.location.href = "{% url 'signup' %}";
+                return;
+            }
+        }
+
+        if (currentStage === 2) {
+            const password = form.querySelector('input[name="password"]').value;
+            if (password.length < 8) {
+                showNotification('Password must be at least 8 characters long', 'error');
+                return;
+            }
+            
+            const confirmPassword = form.querySelector('input[name="password_confirm"]').value;
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'error');
+                return;
+            }
+        }
+
+        if (currentStage === 3) {
+            const requiredUploads = selectedRole === 'health-professional' ? 2 : 1;
+            console.log('Required uploads:', requiredUploads);
+            console.log('Current uploads:', uploadedFiles.size);
+            
+            if (uploadedFiles.size >= requiredUploads) {
+                // Prepare form data for submission
+                const formData = new FormData(form);
+                formData.append('selectedRole', selectedRole);
+                
+                console.log('Submitting form data...');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
+                // Submit the form
+         // Submit the form
+fetch("{% url 'handle_registration' %}", {
+    method: 'POST',
+    body: formData,
+    headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+})
+.then(response => {
+    console.log('Response status:', response.status);
+    return response.json();
+})
+.then(data => {
+    console.log('Server response:', data);
+    if (data.success) {
+        document.querySelector(`#stage-${getStageId(currentStage)}`).classList.add('hidden');
+        currentStage++;
+        document.querySelector(`#stage-${getStageId(currentStage)}`).classList.remove('hidden');
+        updateProgress();
+        updateNavigation();
+        showNotification(data.message, 'success');
+    }
+})
+.catch(error => {
+    console.log('Submission error:', error);
+    showNotification('Registration failed. Please try again.', 'error');
+});
+
+            } else {
+                showNotification('Please upload all required documents', 'error');
+            }
             return;
         }
 
-        if (currentStage < 4) {
-            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.add('hidden');
-            currentStage++;
-            document.querySelector(`#stage-${getStageId(currentStage)}`).classList.remove('hidden');
-            
-            updateProgress();
-            updateNavigation();
-            
-            if (currentStage === 2) {
-                showRelevantFields();
-            }
+        document.querySelector(`#stage-${getStageId(currentStage)}`).classList.add('hidden');
+        currentStage++;
+        document.querySelector(`#stage-${getStageId(currentStage)}`).classList.remove('hidden');
+        
+        updateProgress();
+        updateNavigation();
+        
+        if (currentStage === 2) {
+            showRelevantFields();
+            btnNext.disabled = true;
         }
     });
 
@@ -590,28 +731,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Dashboard redirect
     document.querySelector('.btn-dashboard').addEventListener('click', function() {
-        switch(selectedRole) {
-            case 'clinic-admin':
-                window.location.href = "{% url 'login' %}";
-                break;
-            case 'doctor':
-                window.location.href = "{% url 'login' %}";
-                break;
-            case 'patient':
-                window.location.href = "{% url 'signup' %}";
-                break;
-            default:
-                window.location.href = "{% url 'home' %}";
-        }
+        window.location.href = "{% url 'login' %}";
     });
 
-    // Helper functions
     function getStageId(stage) {
         const stages = ['role', 'info', 'verify', 'complete'];
         return stages[stage - 1];
     }
 
     function updateProgress() {
+        const progress = (currentStage - 1) * 33.33;
+        const progressBar = document.querySelector('.setup-progress');
+        progressBar.setAttribute('data-progress', progress);
+        
         progressSteps.forEach(step => {
             const stepNum = parseInt(step.dataset.step);
             step.classList.toggle('active', stepNum <= currentStage);
@@ -621,7 +753,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateNavigation() {
         btnBack.classList.toggle('hidden', currentStage === 1);
         btnNext.classList.toggle('hidden', currentStage === 4);
-        btnNext.disabled = true;
         
         if (currentStage === 4) {
             document.querySelector('.btn-dashboard').classList.remove('hidden');
@@ -634,29 +765,88 @@ document.addEventListener('DOMContentLoaded', function() {
         
         clinicFields.forEach(field => {
             field.classList.toggle('hidden', selectedRole !== 'clinic-admin');
+            if (selectedRole === 'clinic-admin') {
+                field.querySelector('input, select')?.setAttribute('required', 'required');
+            } else {
+                field.querySelector('input, select')?.removeAttribute('required');
+            }
         });
         
         doctorFields.forEach(field => {
-            field.classList.toggle('hidden', selectedRole !== 'doctor');
+            field.classList.toggle('hidden', selectedRole !== 'health-professional');
+            if (selectedRole === 'health-professional') {
+                field.querySelector('input, select')?.setAttribute('required', 'required');
+            } else {
+                field.querySelector('input, select')?.removeAttribute('required');
+            }
         });
     }
 
-    function updateUploadStatus(type, success) {
+    async function handleFileUpload(file, type) {
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('type', type);
+        formData.append('role', selectedRole);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
         const uploadBox = document.querySelector(`.upload-box[data-type="${type}"]`);
-        const statusDiv = uploadBox.querySelector('.upload-status');
-        statusDiv.textContent = success ? 'Upload successful' : 'Upload failed';
-        statusDiv.className = `upload-status ${success ? 'success' : 'error'}`;
+        const statusDiv = uploadBox.querySelector('.upload-status') || createStatusDiv(uploadBox);
+
+        try {
+            const response = await fetch('/upload-verification-doc/', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                uploadedFiles.add(type);
+                statusDiv.innerHTML = `
+                    <div class="file-preview">
+                        <i class="fas fa-file-alt"></i>
+                        <span>${file.name}</span>
+                        <button class="remove-file" data-type="${type}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                statusDiv.className = 'upload-status success';
+                checkStageCompletion();
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            statusDiv.textContent = 'Upload failed. Please try again.';
+            statusDiv.className = 'upload-status error';
+        }
+    }
+
+    function createStatusDiv(uploadBox) {
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'upload-status';
+        uploadBox.appendChild(statusDiv);
+        return statusDiv;
     }
 
     function checkStageCompletion() {
-        const requiredUploads = selectedRole === 'doctor' ? 2 : 1;
-        btnNext.disabled = uploadedFiles.size < requiredUploads;
+        if (currentStage === 3) {
+            const requiredUploads = selectedRole === 'health-professional' ? 2 : 1;
+            console.log(`Required uploads: ${requiredUploads}`);
+            console.log(`Current uploads: ${uploadedFiles.size}`);
+            btnNext.disabled = uploadedFiles.size < requiredUploads;
+        }
     }
 
-    function showError(message) {
-        // Implement your preferred error display method
-        alert(message);
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `anhis-notification ${type}`;
+        notification.innerHTML = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 });
+
 </script>
 {% endblock %}
