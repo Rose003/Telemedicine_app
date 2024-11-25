@@ -106,7 +106,7 @@ def get_chatbot_response(user_message):
     })
     
     headers = {
-        'x-rapidapi-key': "c4dea7299emsh0c0ae99be693b65p1053ffjsnc9f66b5a4874",
+    'x-rapidapi-key': "c3144f5a63mshb497182868ec293p12a057jsnec29e3ab4530",
         'x-rapidapi-host': "chatgpt-gpt4-ai-chatbot.p.rapidapi.com",
         'Content-Type': "application/json"
     }
